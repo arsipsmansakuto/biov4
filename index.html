@@ -1,0 +1,6236 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
+
+  <style>
+    :root{
+      --primary:#2563eb;
+      --bg:#f3f4f6;
+      --card:#ffffff;
+      --text:#111827;
+      --muted:#6b7280;
+      --border:#e5e7eb;
+      --danger:#dc2626;
+      --success:#16a34a;
+      --radius:20px;
+      --shadow:0 18px 45px rgba(15,23,42,.12);
+    }
+
+    *{
+      box-sizing:border-box;
+    }
+
+    body{
+      margin:0;
+      font-family:Inter, Arial, sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.20), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(14,165,233,.16), transparent 32%),
+        var(--bg);
+      color:var(--text);
+      min-height:100vh;
+    }
+
+    button,
+    input,
+    textarea,
+    select{
+      font-family:inherit;
+    }
+
+    .hidden{
+      display:none !important;
+    }
+
+    .app-shell{
+      width:100%;
+      min-height:100vh;
+      display:flex;
+      justify-content:center;
+      padding:24px 14px;
+    }
+
+    .phone-frame{
+      width:100%;
+      max-width:430px;
+      min-height:calc(100vh - 48px);
+      background:rgba(255,255,255,.75);
+      backdrop-filter:blur(16px);
+      border:1px solid rgba(255,255,255,.7);
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      position:relative;
+    }
+
+    .hero{
+      padding:34px 24px 18px;
+      text-align:center;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .hero::before{
+      content:"";
+      width:220px;
+      height:220px;
+      background:var(--primary);
+      opacity:.14;
+      border-radius:999px;
+      position:absolute;
+      top:-110px;
+      left:50%;
+      transform:translateX(-50%);
+    }
+
+    .avatar-wrap{
+      width:116px;
+      height:116px;
+      margin:0 auto 16px;
+      border-radius:999px;
+      padding:5px;
+      background:linear-gradient(135deg, var(--primary), #38bdf8);
+      position:relative;
+      z-index:1;
+      box-shadow:0 12px 28px rgba(37,99,235,.28);
+    }
+
+    .avatar{
+      width:100%;
+      height:100%;
+      border-radius:999px;
+      object-fit:cover;
+      background:#fff;
+      border:4px solid #fff;
+    }
+
+    .name{
+      font-size:24px;
+      font-weight:900;
+      letter-spacing:-.04em;
+      margin:0;
+      position:relative;
+      z-index:1;
+    }
+
+    .bio{
+      font-size:14px;
+      line-height:1.55;
+      color:var(--muted);
+      margin:8px auto 0;
+      max-width:320px;
+      position:relative;
+      z-index:1;
+    }
+
+    .socials{
+      display:flex;
+      justify-content:center;
+      gap:10px;
+      margin-top:16px;
+      position:relative;
+      z-index:1;
+      flex-wrap:wrap;
+    }
+
+    .socials a{
+      width:38px;
+      height:38px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-decoration:none;
+      background:#fff;
+      color:var(--text);
+      border:1px solid var(--border);
+      border-radius:999px;
+      box-shadow:0 8px 18px rgba(15,23,42,.08);
+      transition:.2s;
+    }
+
+    .socials a:hover{
+      transform:translateY(-2px);
+      border-color:var(--primary);
+    }
+
+    .links{
+      padding:8px 20px 24px;
+    }
+
+    .link-btn{
+      width:100%;
+      display:flex;
+      align-items:center;
+      gap:12px;
+      text-decoration:none;
+      background:#fff;
+      border:1px solid rgba(229,231,235,.95);
+      color:var(--text);
+      padding:15px 16px;
+      border-radius:18px;
+      margin-bottom:12px;
+      box-shadow:0 10px 24px rgba(15,23,42,.08);
+      transition:.2s;
+    }
+
+    .link-btn:hover{
+      transform:translateY(-2px);
+      border-color:var(--primary);
+      box-shadow:0 14px 30px rgba(15,23,42,.13);
+    }
+
+    .link-icon{
+      width:42px;
+      height:42px;
+      flex:0 0 42px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(37,99,235,.1);
+      border-radius:14px;
+      font-size:20px;
+    }
+
+    .link-title{
+      flex:1;
+      font-size:15px;
+      font-weight:800;
+    }
+
+    .link-arrow{
+      color:var(--muted);
+    }
+
+    .footer{
+      text-align:center;
+      padding:4px 16px 24px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .admin-fab{
+      position:fixed;
+      right:18px;
+      bottom:18px;
+      background:var(--text);
+      color:#fff;
+      text-decoration:none;
+      padding:12px 16px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:800;
+      box-shadow:0 12px 30px rgba(0,0,0,.25);
+    }
+
+    .loading{
+      padding:80px 24px;
+      text-align:center;
+      color:var(--muted);
+      font-weight:700;
+    }
+
+    /* ADMIN */
+    .admin-layout{
+      max-width:1080px;
+      width:100%;
+      margin:0 auto;
+      padding:24px;
+    }
+
+    .admin-header{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:20px;
+      box-shadow:0 10px 30px rgba(15,23,42,.08);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:16px;
+      margin-bottom:18px;
+    }
+
+    .admin-header h1{
+      margin:0;
+      font-size:24px;
+      letter-spacing:-.04em;
+    }
+
+    .admin-header p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .admin-grid{
+      display:grid;
+      grid-template-columns:380px 1fr;
+      gap:18px;
+    }
+
+    .panel{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:18px;
+      box-shadow:0 10px 30px rgba(15,23,42,.08);
+    }
+
+    .panel-title{
+      margin:0 0 14px;
+      font-size:16px;
+      font-weight:900;
+    }
+
+    .form-group{
+      margin-bottom:12px;
+    }
+
+    label{
+      display:block;
+      font-size:12px;
+      font-weight:800;
+      margin-bottom:6px;
+      color:#374151;
+    }
+
+    input,
+    textarea,
+    select{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:14px;
+      padding:12px 13px;
+      font-size:14px;
+      outline:none;
+      background:#fff;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus{
+      border-color:var(--primary);
+      box-shadow:0 0 0 4px rgba(37,99,235,.1);
+    }
+
+    textarea{
+      min-height:82px;
+      resize:vertical;
+    }
+
+    .btn{
+      border:0;
+      border-radius:14px;
+      padding:12px 14px;
+      font-size:14px;
+      font-weight:900;
+      cursor:pointer;
+      background:var(--primary);
+      color:#fff;
+      transition:.2s;
+    }
+
+    .btn:hover{
+      filter:brightness(.96);
+      transform:translateY(-1px);
+    }
+
+    .btn:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .btn-secondary{
+      background:#111827;
+    }
+
+    .btn-light{
+      background:#f3f4f6;
+      color:#111827;
+      border:1px solid var(--border);
+    }
+
+    .btn-danger{
+      background:var(--danger);
+    }
+
+    .btn-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .link-table{
+      width:100%;
+      border-collapse:collapse;
+    }
+
+    .link-table th,
+    .link-table td{
+      padding:12px 10px;
+      border-bottom:1px solid var(--border);
+      text-align:left;
+      font-size:13px;
+      vertical-align:top;
+    }
+
+    .link-table th{
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.06em;
+      color:var(--muted);
+    }
+
+    .badge{
+      display:inline-flex;
+      padding:5px 8px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:900;
+    }
+
+    .badge.active{
+      color:#166534;
+      background:#dcfce7;
+    }
+
+    .badge.inactive{
+      color:#991b1b;
+      background:#fee2e2;
+    }
+
+    .action-btn{
+      border:0;
+      border-radius:10px;
+      padding:8px 9px;
+      font-size:12px;
+      cursor:pointer;
+      font-weight:800;
+      margin:2px;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:24px;
+      transform:translateX(-50%);
+      background:#111827;
+      color:#fff;
+      padding:12px 16px;
+      border-radius:999px;
+      font-size:13px;
+      font-weight:800;
+      box-shadow:0 12px 30px rgba(0,0,0,.25);
+      z-index:99;
+    }
+
+    .empty{
+      text-align:center;
+      padding:34px 20px;
+      color:var(--muted);
+      font-size:14px;
+    }
+
+
+
+    /* VER 1.1 - TABLE TOOLBAR & PAGINATION */
+    .table-toolbar{
+      display:grid;
+      grid-template-columns:minmax(220px,1fr) 170px 180px 110px;
+      gap:10px;
+      margin:12px 0;
+      align-items:center;
+    }
+
+    .table-toolbar input,
+    .table-toolbar select{
+      min-height:42px;
+    }
+
+    .table-meta{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:12px;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:700;
+    }
+
+    .pagination{
+      display:flex;
+      align-items:center;
+      gap:6px;
+      flex-wrap:wrap;
+    }
+
+    .page-btn{
+      min-width:36px;
+      height:36px;
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--text);
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:800;
+      padding:0 10px;
+    }
+
+    .page-btn:hover:not(:disabled){
+      border-color:var(--primary);
+      transform:translateY(-1px);
+    }
+
+    .page-btn.active{
+      background:var(--primary);
+      color:#fff;
+      border-color:var(--primary);
+    }
+
+    .page-btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    .table-result-info{
+      background:#f9fafb;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:9px 12px;
+    }
+
+    @media(max-width:760px){
+      .table-toolbar{
+        grid-template-columns:1fr 1fr;
+      }
+    }
+
+    @media(max-width:520px){
+      .table-toolbar{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media(max-width:860px){
+      .admin-grid{
+        grid-template-columns:1fr;
+      }
+
+      .admin-header{
+        align-items:flex-start;
+        flex-direction:column;
+      }
+
+      .link-table{
+        display:block;
+        overflow-x:auto;
+      }
+    }
+
+    .icon-picker{
+      display:grid;
+      grid-template-columns:repeat(8, 1fr);
+      gap:8px;
+      margin-bottom:8px;
+    }
+
+    .icon-option{
+      width:100%;
+      aspect-ratio:1/1;
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:12px;
+      font-size:20px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      transition:.2s;
+    }
+
+    .icon-option:hover{
+      transform:translateY(-1px);
+      border-color:var(--primary);
+      box-shadow:0 8px 18px rgba(15,23,42,.08);
+    }
+
+    .icon-option.active{
+      border-color:var(--primary);
+      background:rgba(37,99,235,.10);
+      box-shadow:0 0 0 3px rgba(37,99,235,.12);
+    }
+
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(15,23,42,.55);
+      backdrop-filter:blur(6px);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:120;
+    }
+
+    .modal-card{
+      width:100%;
+      max-width:440px;
+      background:#fff;
+      border-radius:22px;
+      box-shadow:0 24px 70px rgba(0,0,0,.28);
+      border:1px solid rgba(255,255,255,.8);
+      padding:18px;
+      animation:modalPop .18s ease-out;
+    }
+
+    @keyframes modalPop{
+      from{
+        transform:translateY(10px) scale(.98);
+        opacity:0;
+      }
+      to{
+        transform:translateY(0) scale(1);
+        opacity:1;
+      }
+    }
+
+    .modal-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:14px;
+      margin-bottom:14px;
+      border-bottom:1px solid var(--border);
+      padding-bottom:12px;
+    }
+
+    .modal-header h3{
+      margin:0;
+      font-size:18px;
+      font-weight:900;
+      letter-spacing:-.03em;
+    }
+
+    .modal-header p{
+      margin:4px 0 0;
+      font-size:12px;
+      line-height:1.5;
+      color:var(--muted);
+    }
+
+    .modal-close{
+      width:36px;
+      height:36px;
+      border:0;
+      border-radius:999px;
+      background:#f3f4f6;
+      color:#111827;
+      font-size:24px;
+      line-height:1;
+      cursor:pointer;
+      font-weight:700;
+    }
+
+    .modal-close:hover{
+      background:#e5e7eb;
+    }
+
+    .theme-preview-card{
+      border:1px solid var(--border);
+      border-radius:22px;
+      padding:18px;
+      text-align:center;
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.20), transparent 30%),
+        #f9fafb;
+      transition:.25s;
+      overflow:hidden;
+    }
+
+    .theme-preview-avatar{
+      width:72px;
+      height:72px;
+      border-radius:999px;
+      margin:0 auto 10px;
+      background:linear-gradient(135deg, var(--primary), #38bdf8);
+      border:4px solid #fff;
+      box-shadow:0 10px 24px rgba(15,23,42,.16);
+    }
+
+    .theme-preview-name{
+      font-size:16px;
+      font-weight:900;
+      margin-bottom:4px;
+    }
+
+    .theme-preview-bio{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:14px;
+    }
+
+    .theme-preview-btn{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:12px 14px;
+      border-radius:16px;
+      background:#fff;
+      border:1px solid var(--border);
+      margin-top:10px;
+      box-shadow:0 8px 18px rgba(15,23,42,.08);
+      font-size:13px;
+      transition:.25s;
+    }
+
+    .theme-preview-btn span{
+      width:32px;
+      height:32px;
+      border-radius:10px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:rgba(37,99,235,.10);
+    }
+
+    /* Background Preview */
+    .theme-preview-card.bg-soft{
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.22), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(14,165,233,.18), transparent 34%),
+        #f3f4f6;
+    }
+
+    .theme-preview-card.bg-dark{
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,.35), transparent 32%),
+        #111827;
+      color:#fff;
+    }
+
+    .theme-preview-card.bg-dark .theme-preview-bio{
+      color:#d1d5db;
+    }
+
+    .theme-preview-card.bg-clean{
+      background:#ffffff;
+    }
+
+    .theme-preview-card.bg-glass{
+      background:
+        linear-gradient(135deg, rgba(37,99,235,.18), rgba(14,165,233,.16)),
+        rgba(255,255,255,.65);
+      backdrop-filter:blur(14px);
+    }
+
+    /* Button Preview */
+    .theme-preview-card.btn-pill .theme-preview-btn{
+      border-radius:999px;
+    }
+
+    .theme-preview-card.btn-glass .theme-preview-btn{
+      background:rgba(255,255,255,.56);
+      backdrop-filter:blur(12px);
+    }
+
+    .theme-preview-card.btn-outline .theme-preview-btn{
+      background:transparent;
+      border:2px solid var(--primary);
+      box-shadow:none;
+    }
+
+    .theme-preview-card.btn-card .theme-preview-btn{
+      border-radius:16px;
+    }
+
+    body.public-bg-soft{
+      background:
+        radial-gradient(circle at top left, rgba(37,99,235,.20), transparent 28%),
+        radial-gradient(circle at bottom right, rgba(14,165,233,.16), transparent 32%),
+        #f3f4f6;
+    }
+
+    body.public-bg-dark{
+      background:
+        radial-gradient(circle at top left, rgba(59,130,246,.32), transparent 30%),
+        radial-gradient(circle at bottom right, rgba(14,165,233,.18), transparent 34%),
+        #111827;
+    }
+
+    body.public-bg-dark .phone-frame{
+      background:rgba(17,24,39,.82);
+      color:#fff;
+      border-color:rgba(255,255,255,.12);
+    }
+
+    body.public-bg-dark .bio,
+    body.public-bg-dark .footer,
+    body.public-bg-dark .link-arrow{
+      color:#d1d5db;
+    }
+
+    body.public-bg-dark .link-btn,
+    body.public-bg-dark .socials a{
+      background:rgba(255,255,255,.08);
+      color:#fff;
+      border-color:rgba(255,255,255,.16);
+    }
+
+    body.public-bg-clean{
+      background:#ffffff;
+    }
+
+    body.public-bg-clean .phone-frame{
+      box-shadow:none;
+      border-color:#f3f4f6;
+    }
+
+    body.public-bg-glass{
+      background:
+        linear-gradient(135deg, rgba(37,99,235,.18), rgba(14,165,233,.16)),
+        #eef2ff;
+    }
+
+    body.public-btn-pill .link-btn{
+      border-radius:999px;
+    }
+
+    body.public-btn-glass .link-btn{
+      background:rgba(255,255,255,.58);
+      backdrop-filter:blur(14px);
+    }
+
+    body.public-btn-outline .link-btn{
+      background:transparent;
+      border:2px solid var(--primary);
+      box-shadow:none;
+    }
+
+    body.public-btn-card .link-btn{
+      border-radius:18px;
+    }
+
+    .avatar-admin-preview{
+      width:96px;
+      height:96px;
+      border-radius:999px;
+      padding:4px;
+      background:linear-gradient(135deg, var(--primary), #38bdf8);
+      margin:0 0 10px;
+      box-shadow:0 10px 24px rgba(15,23,42,.16);
+      overflow:hidden;
+    }
+
+    .avatar-admin-preview img{
+      width:100%;
+      height:100%;
+      display:block;
+      border-radius:999px;
+      object-fit:cover;
+      background:#fff;
+      border:3px solid #fff;
+    }
+
+    .qr-card{
+      display:grid;
+      grid-template-columns:160px 1fr;
+      gap:18px;
+      align-items:center;
+    }
+
+    .qr-box{
+      width:150px;
+      height:150px;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:12px;
+      box-shadow:0 10px 24px rgba(15,23,42,.08);
+    }
+
+    .qr-box canvas,
+    .qr-box img{
+      max-width:126px;
+      max-height:126px;
+    }
+
+    .public-link-box{
+      background:#f9fafb;
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:12px;
+      font-size:13px;
+      color:#374151;
+      word-break:break-all;
+      margin:10px 0;
+    }
+
+    @media(max-width:640px){
+      .qr-card{
+        grid-template-columns:1fr;
+      }
+
+      .qr-box{
+        margin:auto;
+      }
+    }
+
+
+    /* VER 1.2 - Smart Analytics */
+    .stats-grid-v12{
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:12px;
+    }
+
+    .stat-card-v12{
+      background:linear-gradient(145deg,#ffffff,#f8fafc);
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:15px;
+      min-width:0;
+    }
+
+    .stat-label-v12{
+      font-size:11px;
+      color:var(--muted);
+      font-weight:900;
+      text-transform:uppercase;
+      letter-spacing:.05em;
+    }
+
+    .stat-value-v12{
+      margin-top:5px;
+      font-size:27px;
+      line-height:1;
+      font-weight:950;
+      letter-spacing:-.04em;
+    }
+
+    .analytics-head-v12{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      margin-bottom:14px;
+    }
+
+    .analytics-head-v12 .panel-title{margin:0;}
+
+    .analytics-grid-v12{
+      display:grid;
+      grid-template-columns:minmax(0,1.65fr) minmax(280px,.85fr);
+      gap:16px;
+    }
+
+    .analytics-box-v12{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:15px;
+      background:#fbfdff;
+      min-width:0;
+    }
+
+    .analytics-box-v12 h3{
+      margin:0 0 12px;
+      font-size:14px;
+      font-weight:900;
+    }
+
+    .chart-bars-v12{
+      height:235px;
+      display:flex;
+      align-items:flex-end;
+      gap:5px;
+      padding:16px 4px 26px;
+      border-bottom:1px solid var(--border);
+      overflow:hidden;
+    }
+
+    .chart-item-v12{
+      flex:1 1 0;
+      min-width:4px;
+      height:100%;
+      display:flex;
+      flex-direction:column;
+      justify-content:flex-end;
+      align-items:center;
+      position:relative;
+    }
+
+    .chart-bar-v12{
+      width:100%;
+      max-width:24px;
+      min-height:3px;
+      border-radius:8px 8px 3px 3px;
+      background:linear-gradient(180deg,var(--primary),#38bdf8);
+      transition:.2s;
+      cursor:default;
+    }
+
+    .chart-bar-v12:hover{filter:brightness(.9);transform:translateY(-2px);}
+
+    .chart-label-v12{
+      position:absolute;
+      top:calc(100% + 7px);
+      font-size:9px;
+      color:var(--muted);
+      white-space:nowrap;
+      transform:rotate(-35deg);
+      transform-origin:top center;
+    }
+
+    .analytics-summary-v12{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .analytics-summary-v12 strong{color:var(--text);}
+
+    .rank-row-v12{
+      display:grid;
+      grid-template-columns:26px minmax(0,1fr) auto;
+      align-items:center;
+      gap:9px;
+      padding:10px 0;
+      border-bottom:1px solid var(--border);
+    }
+
+    .rank-row-v12:last-child{border-bottom:0;}
+    .rank-number-v12{
+      width:25px;height:25px;border-radius:9px;background:rgba(37,99,235,.1);
+      display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;
+    }
+    .rank-title-v12{font-size:12px;font-weight:850;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+    .rank-click-v12{font-size:12px;font-weight:950;color:var(--primary);}
+
+    .device-row-v12{margin-top:10px;}
+    .device-meta-v12{display:flex;justify-content:space-between;font-size:12px;margin-bottom:5px;}
+    .device-track-v12{height:9px;background:#e5e7eb;border-radius:999px;overflow:hidden;}
+    .device-fill-v12{height:100%;background:linear-gradient(90deg,var(--primary),#38bdf8);border-radius:999px;}
+
+    @media(max-width:900px){
+      .stats-grid-v12{grid-template-columns:repeat(2,minmax(0,1fr));}
+      .analytics-grid-v12{grid-template-columns:1fr;}
+    }
+
+    @media(max-width:520px){
+      .stats-grid-v12{grid-template-columns:1fr 1fr;}
+      .analytics-head-v12{align-items:flex-start;flex-direction:column;}
+      .chart-bars-v12{height:190px;gap:3px;}
+      .chart-label-v12{display:none;}
+    }
+
+    /* =========================================
+      VER 1.3 - SMART CAMPAIGN
+    ========================================= */
+
+    .link-btn{
+      position:relative;
+    }
+
+    .link-btn.featured-link{
+      padding:18px;
+      border:2px solid var(--primary);
+
+      background:
+        linear-gradient(
+          135deg,
+          rgba(37,99,235,.12),
+          rgba(56,189,248,.07)
+        ),
+        #fff;
+
+      box-shadow:
+        0 18px 38px
+        rgba(37,99,235,.18);
+    }
+
+    .featured-label{
+      position:absolute;
+
+      top:-9px;
+      right:12px;
+
+      padding:5px 9px;
+
+      background:var(--primary);
+      color:#fff;
+
+      border-radius:999px;
+
+      font-size:9px;
+      font-weight:900;
+
+      letter-spacing:.07em;
+    }
+
+    .link-content-v13{
+      flex:1;
+      min-width:0;
+    }
+
+    .link-title-v13{
+      font-size:15px;
+      font-weight:900;
+    }
+
+    .link-meta-v13{
+      display:flex;
+      gap:5px;
+      flex-wrap:wrap;
+      margin-top:5px;
+    }
+
+    .mini-badge-v13{
+      display:inline-flex;
+
+      padding:3px 7px;
+
+      border-radius:999px;
+
+      background:#f3f4f6;
+
+      color:#6b7280;
+
+      font-size:9px;
+      font-weight:850;
+    }
+
+    .featured-link
+    .mini-badge-v13{
+
+      background:
+        rgba(37,99,235,.10);
+
+      color:var(--primary);
+    }
+
+    /* =========================================
+      EVOLUTION 1 - QR BRANDING
+    ========================================= */
+
+    .qr-logo-option{
+      margin-top:12px;
+      padding:12px 13px;
+
+      background:var(--card);
+      color:var(--text);
+
+      border:1px solid var(--border);
+      border-radius:14px;
+    }
+
+    .qr-logo-switch{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+
+      margin:0;
+      cursor:pointer;
+
+      color:var(--text);
+    }
+
+    .qr-logo-switch input{
+      width:18px;
+      height:18px;
+
+      flex:0 0 18px;
+
+      margin-top:2px;
+
+      accent-color:var(--primary);
+    }
+
+    .qr-logo-switch span{
+      display:block;
+      min-width:0;
+    }
+
+    .qr-logo-switch strong{
+      display:block;
+
+      font-size:13px;
+      line-height:1.35;
+    }
+
+    .qr-logo-switch small{
+      display:block;
+
+      margin-top:4px;
+
+      color:var(--muted);
+
+      font-size:11px;
+      line-height:1.45;
+    }
+
+    /* =========================================
+   EVOLUTION 2 - SPLIT VIEW
+========================================= */
+
+.public-layout-container{
+  width:100%;
+}
+
+.public-preview-panel{
+  display:none;
+}
+
+.split-menu-label{
+  display:none;
+}
+
+
+/* =========================================
+   SPLIT MODE
+========================================= */
+
+body.public-layout-split .app-shell{
+  align-items:flex-start;
+}
+
+body.public-layout-split .phone-frame{
+  max-width:1180px;
+  min-height:calc(100vh - 48px);
+}
+
+body.public-layout-split
+.public-layout-container{
+  display:grid;
+
+  grid-template-columns:
+    minmax(310px, 370px)
+    minmax(0, 1fr);
+
+  min-height:
+    calc(100vh - 48px);
+}
+
+
+/* LEFT PANEL */
+
+body.public-layout-split
+.public-left-panel{
+  min-width:0;
+
+  border-right:
+    1px solid var(--border);
+
+  background:
+    rgba(255,255,255,.48);
+}
+
+body.public-layout-split
+.hero{
+  padding:
+    28px 22px 16px;
+}
+
+body.public-layout-split
+.avatar-wrap{
+  width:96px;
+  height:96px;
+}
+
+body.public-layout-split
+.name{
+  font-size:21px;
+}
+
+body.public-layout-split
+.links{
+  padding:
+    8px 18px 22px;
+}
+
+body.public-layout-split
+.split-menu-label{
+  display:block;
+
+  padding:
+    4px 20px 8px;
+
+  color:var(--muted);
+
+  font-size:10px;
+  font-weight:950;
+
+  letter-spacing:.12em;
+}
+
+
+/* Menu active */
+
+body.public-layout-split
+.link-btn{
+  cursor:pointer;
+}
+
+body.public-layout-split
+.link-btn.split-active{
+  border-color:
+    var(--primary);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(37,99,235,.10),
+    0 14px 30px
+    rgba(15,23,42,.10);
+
+  transform:
+    translateY(-1px);
+}
+
+body.public-layout-split
+.link-btn.split-active
+.link-icon{
+  background:
+    var(--primary);
+
+  color:#fff;
+}
+
+
+/* =========================================
+   RIGHT PREVIEW
+========================================= */
+
+body.public-layout-split
+.public-preview-panel{
+  display:flex;
+
+  min-width:0;
+  min-height:
+    calc(100vh - 48px);
+
+  flex-direction:column;
+
+  background:
+    rgba(248,250,252,.72);
+}
+
+
+.split-preview-header{
+  min-height:74px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:14px;
+
+  padding:
+    14px 18px;
+
+  border-bottom:
+    1px solid var(--border);
+
+  background:
+    rgba(255,255,255,.88);
+
+  backdrop-filter:
+    blur(14px);
+}
+
+
+.split-preview-heading{
+  display:flex;
+  align-items:center;
+  gap:11px;
+
+  min-width:0;
+}
+
+
+.split-preview-icon{
+  width:42px;
+  height:42px;
+
+  flex:0 0 42px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:13px;
+
+  background:
+    rgba(37,99,235,.10);
+
+  font-size:20px;
+}
+
+
+.split-preview-eyebrow{
+  color:var(--muted);
+
+  font-size:9px;
+  font-weight:950;
+
+  letter-spacing:.12em;
+}
+
+
+.split-preview-header h2{
+  margin:2px 0 0;
+
+  font-size:16px;
+  font-weight:950;
+
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  max-width:430px;
+}
+
+
+.split-open-external{
+  flex:0 0 auto;
+
+  padding:
+    9px 12px;
+
+  border:
+    1px solid var(--border);
+
+  border-radius:
+    11px;
+
+  background:#fff;
+
+  color:var(--text);
+
+  text-decoration:none;
+
+  font-size:11px;
+  font-weight:900;
+}
+
+
+.split-open-external:hover{
+  border-color:
+    var(--primary);
+
+  color:
+    var(--primary);
+}
+
+
+/* EMPTY PREVIEW */
+
+.split-preview-placeholder{
+  flex:1;
+
+  min-height:460px;
+
+  display:flex;
+  flex-direction:column;
+
+  justify-content:center;
+  align-items:center;
+
+  text-align:center;
+
+  padding:40px;
+}
+
+
+.split-placeholder-icon{
+  width:72px;
+  height:72px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  margin-bottom:16px;
+
+  border-radius:22px;
+
+  background:
+    rgba(37,99,235,.10);
+
+  color:
+    var(--primary);
+
+  font-size:30px;
+  font-weight:900;
+}
+
+
+.split-preview-placeholder h3{
+  margin:0;
+
+  font-size:20px;
+  font-weight:950;
+}
+
+
+.split-preview-placeholder p{
+  max-width:390px;
+
+  margin:
+    8px auto 0;
+
+  color:
+    var(--muted);
+
+  font-size:13px;
+  line-height:1.6;
+}
+
+
+/* FRAME */
+
+.split-frame-wrap{
+  flex:1;
+
+  min-height:
+    560px;
+
+  background:#fff;
+}
+
+
+.split-frame-wrap iframe{
+  display:block;
+
+  width:100%;
+  height:100%;
+  min-height:560px;
+
+  border:0;
+
+  background:#fff;
+}
+
+
+/* LOADING */
+
+.split-preview-loading{
+  flex:1;
+
+  min-height:460px;
+
+  display:flex;
+  flex-direction:column;
+
+  align-items:center;
+  justify-content:center;
+
+  gap:12px;
+
+  color:var(--muted);
+
+  font-size:12px;
+  font-weight:850;
+}
+
+
+.split-spinner{
+  width:30px;
+  height:30px;
+
+  border-radius:999px;
+
+  border:
+    3px solid
+    rgba(37,99,235,.16);
+
+  border-top-color:
+    var(--primary);
+
+  animation:
+    splitSpin .8s
+    linear
+    infinite;
+}
+
+
+@keyframes splitSpin{
+  to{
+    transform:
+      rotate(360deg);
+  }
+}
+
+
+.split-iframe-notice{
+  padding:
+    9px 14px;
+
+  border-top:
+    1px solid var(--border);
+
+  background:
+    #fff7ed;
+
+  color:
+    #9a3412;
+
+  font-size:10px;
+  line-height:1.5;
+}
+
+
+/* =========================================
+   DARK THEME
+========================================= */
+
+body.public-bg-dark.public-layout-split
+.public-left-panel{
+  background:
+    rgba(17,24,39,.48);
+
+  border-color:
+    rgba(255,255,255,.12);
+}
+
+
+body.public-bg-dark.public-layout-split
+.public-preview-panel{
+  background:
+    rgba(17,24,39,.78);
+}
+
+
+body.public-bg-dark
+.split-preview-header{
+  background:
+    rgba(17,24,39,.92);
+
+  border-color:
+    rgba(255,255,255,.12);
+}
+
+
+body.public-bg-dark
+.split-preview-header h2{
+  color:#fff;
+}
+
+
+body.public-bg-dark
+.split-preview-icon{
+  background:
+    rgba(255,255,255,.10);
+}
+
+
+body.public-bg-dark
+.split-open-external{
+  background:
+    rgba(255,255,255,.08);
+
+  color:#fff;
+
+  border-color:
+    rgba(255,255,255,.16);
+}
+
+
+body.public-bg-dark
+.split-preview-placeholder h3{
+  color:#fff;
+}
+
+
+body.public-bg-dark
+.split-frame-wrap{
+  background:#111827;
+}
+
+
+/* =========================================
+   TABLET / MOBILE
+========================================= */
+
+@media(max-width:760px){
+
+  body.public-layout-split
+  .app-shell{
+    padding:0;
+  }
+
+
+  body.public-layout-split
+  .phone-frame{
+    max-width:none;
+
+    min-height:100vh;
+
+    border-radius:0;
+    border:0;
+  }
+
+
+  body.public-layout-split
+  .public-layout-container{
+    display:block;
+  }
+
+
+  body.public-layout-split
+  .public-left-panel{
+    border-right:0;
+
+    border-bottom:
+      1px solid var(--border);
+  }
+
+
+  body.public-layout-split
+  .public-preview-panel{
+    min-height:620px;
+  }
+
+
+  .split-preview-header{
+    align-items:flex-start;
+  }
+
+
+  .split-preview-heading{
+    min-width:0;
+    flex:1;
+  }
+
+
+  .split-preview-header h2{
+    max-width:
+      calc(100vw - 190px);
+  }
+
+
+  .split-frame-wrap,
+  .split-frame-wrap iframe{
+    min-height:620px;
+  }
+
+}
+
+  </style>
+</head>
+
+<body>
+  <? if (page === 'admin') { ?>
+
+    <div id="loginPage" class="app-shell hidden">
+      <div class="phone-frame" style="max-width:420px;min-height:auto;">
+        <div class="hero">
+          <div class="avatar-wrap">
+            <img class="avatar" src="https://placehold.co/300x300?text=KSL" alt="Admin">
+          </div>
+
+          <h1 class="name">Admin Login</h1>
+          <p class="bio">Masuk untuk mengelola profil, link, dan statistik klik.</p>
+        </div>
+
+        <div class="links">
+          <form id="loginForm">
+            <div class="form-group">
+              <label>Email Admin</label>
+              <input id="loginEmail" placeholder="admin@ksl.local">
+            </div>
+
+            <div class="form-group">
+              <label>Password</label>
+              <input id="loginPassword" type="password" placeholder="admin123">
+            </div>
+
+            <button type="submit" class="btn" id="btnLogin" style="width:100%;">Login Admin</button>
+
+            <p style="font-size:12px;color:#6b7280;text-align:center;margin-top:14px;">
+              Default: admin@ksl.local / admin123
+            </p>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <div id="adminPage" class="admin-layout hidden">
+      <div class="admin-header">
+        <div>
+          <h1>Admin Bio Link</h1>
+          <p>Kelola profil dan tombol link dari Google Sheets.</p>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn-light" href="<?= ScriptApp.getService().getUrl(); ?>" target="_top" style="text-decoration:none;">Lihat Halaman Publik</a>
+          <button class="btn btn-light" type="button" onclick="openResetPasswordModal()">Reset Password</button>
+          <button class="btn btn-secondary" type="button" onclick="logoutAdmin()">Logout</button>
+        </div>
+      </div>
+
+      <div id="adminLoading" class="panel loading">Memuat data admin...</div>
+
+      <div id="adminContent" class="admin-grid hidden">
+
+        <div class="panel" style="grid-column:1/-1;">
+
+          <h2 class="panel-title">
+            Ringkasan VER 1.3
+          </h2>
+
+          <div class="stats-grid-v12">
+
+            <!-- KPI LAMA -->
+            <div class="stat-card-v12">
+              <div class="stat-label-v12">
+                Total Link
+              </div>
+
+              <div
+                id="statTotalLinks"
+                class="stat-value-v12"
+              >
+                0
+              </div>
+            </div>
+
+
+            <div class="stat-card-v12">
+              <div class="stat-label-v12">
+                Link Aktif
+              </div>
+
+              <div
+                id="statActiveLinks"
+                class="stat-value-v12"
+              >
+                0
+              </div>
+            </div>
+
+
+            <div class="stat-card-v12">
+              <div class="stat-label-v12">
+                Total Klik
+              </div>
+
+              <div
+                id="statTotalClicks"
+                class="stat-value-v12"
+              >
+                0
+              </div>
+            </div>
+
+
+            <div class="stat-card-v12">
+              <div class="stat-label-v12">
+                Klik Hari Ini
+              </div>
+
+              <div
+                id="statClicksToday"
+                class="stat-value-v12"
+              >
+                0
+              </div>
+            </div>
+
+
+            <div class="stat-card-v12">
+              <div class="stat-label-v12">
+                Klik 7 Hari
+              </div>
+
+              <div
+                id="statClicks7Days"
+                class="stat-value-v12"
+              >
+                0
+              </div>
+            </div>
+
+
+            <!-- ====================================
+                VER 1.3 - KPI BARU
+            ===================================== -->
+
+            <div class="stat-card-v12">
+              <div class="stat-label-v12">
+                Page Views
+              </div>
+
+              <div
+                id="statPageViews"
+                class="stat-value-v12"
+              >
+                0
+              </div>
+            </div>
+
+
+            <div class="stat-card-v12">
+              <div class="stat-label-v12">
+                CTR
+              </div>
+
+              <div
+                id="statCTR"
+                class="stat-value-v12"
+              >
+                0%
+              </div>
+            </div>
+
+
+            <div class="stat-card-v12">
+              <div class="stat-label-v12">
+                Link Tayang
+              </div>
+
+              <div
+                id="statLiveLinks"
+                class="stat-value-v12"
+              >
+                0
+              </div>
+            </div>
+
+
+            <div class="stat-card-v12">
+              <div class="stat-label-v12">
+                Terjadwal
+              </div>
+
+              <div
+                id="statScheduledLinks"
+                class="stat-value-v12"
+              >
+                0
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <div class="panel" style="grid-column:1/-1;">
+          <div class="analytics-head-v12">
+            <div>
+              <h2 class="panel-title">Smart Analytics Klik</h2>
+              <p style="margin:4px 0 0;color:var(--muted);font-size:12px;">Pantau tren klik, link terpopuler, dan perangkat pengunjung.</p>
+            </div>
+            <select id="analyticsPeriod" onchange="loadAnalytics(this.value)" style="width:auto;min-width:150px;">
+              <option value="7">7 hari terakhir</option>
+              <option value="30" selected>30 hari terakhir</option>
+              <option value="90">90 hari terakhir</option>
+              <option value="0">Semua data</option>
+            </select>
+          </div>
+
+          <div id="analyticsLoading" class="hidden" style="padding:30px;text-align:center;color:var(--muted);font-weight:800;">Memuat analytics...</div>
+          <div id="analyticsContent" class="analytics-grid-v12">
+            <div class="analytics-box-v12">
+              <h3>Grafik Klik Harian</h3>
+              <div id="clickChart" class="chart-bars-v12"></div>
+              <div class="analytics-summary-v12">
+                <span>Total periode: <strong id="analyticsTotalRange">0</strong></span>
+                <span>Rata-rata: <strong id="analyticsAverage">0</strong> klik/hari</span>
+                <span>Puncak: <strong id="analyticsPeak">-</strong></span>
+              </div>
+            </div>
+
+            <div style="display:grid;gap:16px;">
+              <div class="analytics-box-v12">
+                <h3>Top 5 Link</h3>
+                <div id="topLinksAnalytics"></div>
+              </div>
+              <div class="analytics-box-v12">
+                <h3>Perangkat Pengunjung</h3>
+                <div id="deviceAnalytics"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel" style="grid-column:1/-1;">
+          <h2 class="panel-title">Public Link & QR Code</h2>
+
+          <div class="qr-card">
+            <div class="qr-box">
+              <div id="publicQrCode"></div>
+            </div>
+
+            <div>
+              <label>URL Halaman Publik</label>
+              <div class="public-link-box" id="publicLinkText">
+                Memuat link publik...
+              </div>
+
+              <div class="btn-row">
+                <button type="button" class="btn btn-light" onclick="copyPublicLink()">Copy Public Link</button>
+                <button type="button" class="btn" onclick="downloadQrCode()">Download QR PNG</button>
+                <a class="btn btn-secondary" id="openPublicLinkBtn" href="#" target="_blank" style="text-decoration:none;">Buka Halaman Publik</a>
+              </div>
+
+              <p style="font-size:12px;color:#6b7280;margin:10px 0 0;">
+                QR Code ini mengarah ke halaman publik Bio Link. Cocok untuk dibagikan ke kartu nama, poster, brosur, atau media sosial.
+              </p>
+            </div>
+          </div>
+        </div>
+
+
+        <div class="panel">
+          <h2 class="panel-title">Profil</h2>
+
+          <form id="profileForm">
+            <div class="form-group">
+              <label>Judul Aplikasi</label>
+              <input id="APP_TITLE" placeholder="KSL Bio Link">
+            </div>
+
+            <div class="form-group">
+              <label>Nama / Brand</label>
+              <input id="NAME" placeholder="Kucing Storia Labs">
+            </div>
+
+            <div class="form-group">
+              <label>Bio</label>
+              <textarea id="BIO" placeholder="Deskripsi singkat"></textarea>
+            </div>
+
+            <div class="form-group">
+              <label>Foto Profil / Logo</label>
+
+              <div class="avatar-admin-preview">
+                <img
+                  id="adminAvatarPreview"
+                  src=""
+                  alt=""
+                  onerror="this.onerror=null;this.src=getAvatarFallbackSvg();"
+                >
+              </div>
+
+              <input id="AVATAR_URL" placeholder="https://..." style="margin-bottom:8px;">
+
+              <input id="avatarFile" type="file" accept="image/*">
+
+              <button type="button" class="btn btn-light" id="btnUploadAvatar" onclick="uploadAvatarImage()" style="width:100%;margin-top:8px;">
+                Upload Foto Profil
+              </button>
+
+              <p style="font-size:11px;color:#6b7280;margin:8px 0 0;">
+                Bisa upload JPG, PNG, atau WEBP. Setelah upload, URL otomatis masuk ke Avatar URL.
+              </p>
+
+              <div class="qr-logo-option">
+
+                <label class="qr-logo-switch">
+
+                  <input
+                    type="checkbox"
+                    id="QR_LOGO_ENABLED"
+                    checked
+                  >
+
+                  <span>
+
+                    <strong>
+                      Gunakan logo pada QR Code
+                    </strong>
+
+                    <small>
+                      Foto profil / logo perusahaan akan
+                      ditempatkan di tengah QR Code.
+                    </small>
+
+                  </span>
+
+                </label>
+
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>Theme Color</label>
+              <input id="THEME_COLOR" placeholder="#2563eb">
+            </div>
+
+            <div class="form-group">
+              <label>Background Style</label>
+              <select id="BG_STYLE">
+                <option value="SOFT">Soft Gradient</option>
+                <option value="DARK">Dark Premium</option>
+                <option value="CLEAN">Clean White</option>
+                <option value="GLASS">Glass Blue</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Button Style</label>
+              <select id="BUTTON_STYLE">
+                <option value="CARD">Card Rounded</option>
+                <option value="PILL">Pill Button</option>
+                <option value="GLASS">Glass Button</option>
+                <option value="OUTLINE">Outline Button</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Mode Tampilan Bio Link</label>
+
+              <select id="PUBLIC_LAYOUT_MODE">
+                <option value="STANDARD">
+                  Standard / Bio Link Biasa
+                </option>
+
+                <option value="SPLIT">
+                  Split View / Menu + Preview
+                </option>
+              </select>
+
+              <p style="
+                font-size:11px;
+                color:var(--muted);
+                margin:6px 0 0;
+                line-height:1.5;
+              ">
+                Split View menampilkan daftar menu di kiri
+                dan konten link di panel kanan.
+              </p>
+            </div>
+
+            <div class="form-group">
+              <label>Preview Tema</label>
+              <div class="theme-preview-card" id="themePreviewCard">
+                <div class="theme-preview-avatar"></div>
+                <div class="theme-preview-name" id="themePreviewName">Kucing Storia Labs</div>
+                <div class="theme-preview-bio" id="themePreviewBio">Web App, Google Sheets, Apps Script</div>
+
+                <div class="theme-preview-btn" id="themePreviewBtn1">
+                  <span>▶️</span>
+                  <strong>Playlist Tutorial</strong>
+                </div>
+
+                <div class="theme-preview-btn" id="themePreviewBtn2">
+                  <span>📸</span>
+                  <strong>Instagram</strong>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label>WhatsApp URL</label>
+              <input id="WHATSAPP" placeholder="https://wa.me/628xxx">
+            </div>
+
+            <div class="form-group">
+              <label>Instagram URL</label>
+              <input id="INSTAGRAM" placeholder="https://instagram.com/username">
+            </div>
+
+            <div class="form-group">
+              <label>YouTube URL</label>
+              <input id="YOUTUBE" placeholder="https://youtube.com/@username">
+            </div>
+
+            <div class="form-group">
+              <label>Trakteer URL</label>
+              <input id="TRAKTEER" placeholder="https://trakteer.id/username">
+            </div>
+
+            <button type="submit" class="btn" id="btnSaveProfile">Simpan Profil</button>
+          </form>
+        </div>
+
+        <div class="panel">
+          <h2 class="panel-title">Tambah / Edit Link</h2>
+
+          <form id="linkForm">
+            <input type="hidden" id="ID_LINK">
+
+            <div class="form-group">
+              <label>Judul Link</label>
+              <input id="TITLE" placeholder="Contoh: Playlist Kas RT">
+            </div>
+
+            <div class="form-group">
+              <label>URL</label>
+              <input id="URL" placeholder="https://...">
+            </div>
+
+            <div class="form-group">
+              <label>Icon Emoji</label>
+
+              <div class="icon-picker" id="iconPicker"></div>
+
+              <input id="ICON" placeholder="🔗" readonly>
+            </div>
+
+            <div class="form-group">
+              <label>Urutan</label>
+              <input id="SORT_ORDER" type="number" placeholder="1">
+            </div>
+
+            <div class="form-group">
+              <label>Status</label>
+              <select id="STATUS">
+                <option value="ACTIVE">ACTIVE</option>
+                <option value="INACTIVE">INACTIVE</option>
+              </select>
+            </div>
+
+            <!-- ======================================
+                VER 1.3 - SMART CAMPAIGN
+            ======================================= -->
+
+            <div style="
+              margin:18px 0 14px;
+              padding-top:16px;
+              border-top:1px solid var(--border);
+            ">
+              <div style="
+                font-weight:900;
+                font-size:14px;
+                margin-bottom:4px;
+              ">
+                🚀 Smart Campaign
+              </div>
+
+              <div style="
+                color:var(--muted);
+                font-size:12px;
+                line-height:1.5;
+              ">
+                Atur tujuan, campaign, prioritas,
+                dan jadwal tayang link.
+              </div>
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Tipe CTA</label>
+
+              <select id="CTA_TYPE">
+
+                <option value="LINK">
+                  🔗 Link Biasa
+                </option>
+
+                <option value="WATCH">
+                  ▶️ Watch / Tonton
+                </option>
+
+                <option value="DOWNLOAD">
+                  ⬇️ Download
+                </option>
+
+                <option value="BUY">
+                  🛒 Buy / Beli
+                </option>
+
+                <option value="CONTACT">
+                  💬 Contact
+                </option>
+
+                <option value="PORTFOLIO">
+                  💼 Portfolio
+                </option>
+
+                <option value="SOCIAL">
+                  ❤️ Social Media
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Nama Campaign</label>
+
+              <input
+                id="CAMPAIGN"
+                placeholder="Contoh: Launch DesaKu VER 1"
+              >
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label>Featured Link</label>
+
+              <select id="FEATURED">
+
+                <option value="NO">
+                  Tidak
+                </option>
+
+                <option value="YES">
+                  ⭐ Ya, prioritaskan link ini
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div style="
+              display:grid;
+              grid-template-columns:1fr 1fr;
+              gap:10px;
+            ">
+
+              <div class="form-group">
+
+                <label>Mulai Tayang</label>
+
+                <input
+                  id="START_AT"
+                  type="datetime-local"
+                >
+
+              </div>
+
+
+              <div class="form-group">
+
+                <label>Selesai Tayang</label>
+
+                <input
+                  id="END_AT"
+                  type="datetime-local"
+                >
+
+              </div>
+
+            </div>
+
+
+            <div style="
+              background:#eff6ff;
+              border:1px solid #bfdbfe;
+              border-radius:14px;
+              padding:12px;
+              margin-bottom:14px;
+              font-size:12px;
+              line-height:1.6;
+              color:#1e3a8a;
+            ">
+
+              💡 Kosongkan tanggal jika link ingin
+              selalu ditampilkan selama status ACTIVE.
+
+            </div>
+
+            <div class="btn-row">
+              <button type="submit" class="btn" id="btnSaveLink">Simpan Link</button>
+              <button type="button" class="btn btn-light" onclick="resetLinkForm()">Reset</button>
+            </div>
+          </form>
+
+          <h2 class="panel-title" style="margin-top:24px;">Daftar Link</h2>
+
+          <div class="table-toolbar">
+            <input id="linkSearch" type="search" placeholder="Cari judul atau URL..." oninput="applyLinkTableFilters(true)">
+
+            <select id="linkStatusFilter" onchange="applyLinkTableFilters(true)">
+              <option value="ALL">Semua Status</option>
+              <option value="ACTIVE">Aktif</option>
+              <option value="INACTIVE">Nonaktif</option>
+            </select>
+
+            <select id="linkSort" onchange="applyLinkTableFilters(true)">
+              <option value="ORDER_ASC">Urutan: Kecil ke Besar</option>
+              <option value="ORDER_DESC">Urutan: Besar ke Kecil</option>
+              <option value="TITLE_ASC">Judul: A-Z</option>
+              <option value="TITLE_DESC">Judul: Z-A</option>
+              <option value="CLICK_DESC">Klik: Terbanyak</option>
+              <option value="CLICK_ASC">Klik: Tersedikit</option>
+              <option value="UPDATED_DESC">Terbaru Diperbarui</option>
+            </select>
+
+            <select id="linkPageSize" onchange="changeLinkPageSize()">
+              <option value="10">10 / halaman</option>
+              <option value="25">25 / halaman</option>
+              <option value="50">50 / halaman</option>
+              <option value="100">100 / halaman</option>
+            </select>
+          </div>
+
+          <div id="linksTableWrap"></div>
+
+          <div class="table-meta">
+            <div id="linkResultInfo" class="table-result-info">Menampilkan 0 data</div>
+            <div id="linkPagination" class="pagination"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <? } else { ?>
+    <div class="app-shell">
+      <div class="phone-frame">
+        <div id="publicLoading" class="loading">Memuat halaman...</div>
+
+        <div id="publicContent" class="hidden">
+
+          <div class="public-layout-container">
+
+            <!-- ==============================
+                LEFT : PROFILE + MENU
+            =============================== -->
+            <aside class="public-left-panel">
+
+              <section class="hero">
+
+                <div class="avatar-wrap">
+                  <img
+                    id="avatar"
+                    class="avatar"
+                    src=""
+                    alt="Avatar"
+                  >
+                </div>
+
+                <h1
+                  id="publicName"
+                  class="name"
+                >
+                  Kucing Storia Labs
+                </h1>
+
+                <p
+                  id="publicBio"
+                  class="bio"
+                >
+                  Web App, Google Sheets,
+                  Apps Script, dan Source Code
+                </p>
+
+                <div
+                  class="socials"
+                  id="socials"
+                ></div>
+
+              </section>
+
+
+              <div class="split-menu-label">
+                MENU
+              </div>
+
+
+              <main
+                class="links"
+                id="publicLinks"
+              ></main>
+
+
+              <div class="footer">
+                Dibuat dengan Google Sheets + Apps Script
+                <br>
+
+                <span style="font-size:11px;">
+                  Scan QR dari halaman admin
+                  untuk membagikan bio link.
+                </span>
+              </div>
+
+            </aside>
+
+
+            <!-- ==============================
+                RIGHT : CONTENT PREVIEW
+            =============================== -->
+            <section
+              class="public-preview-panel"
+              id="publicPreviewPanel"
+            >
+
+              <div class="split-preview-header">
+
+                <div class="split-preview-heading">
+
+                  <div
+                    class="split-preview-icon"
+                    id="splitPreviewIcon"
+                  >
+                    🌐
+                  </div>
+
+                  <div>
+
+                    <div class="split-preview-eyebrow">
+                      PREVIEW
+                    </div>
+
+                    <h2 id="splitPreviewTitle">
+                      Pilih menu
+                    </h2>
+
+                  </div>
+
+                </div>
+
+
+                <a
+                  id="splitOpenExternal"
+                  class="split-open-external hidden"
+                  href="#"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  Buka di Tab Baru ↗
+                </a>
+
+              </div>
+
+
+              <!-- Placeholder -->
+              <div
+                id="splitPreviewPlaceholder"
+                class="split-preview-placeholder"
+              >
+
+                <div class="split-placeholder-icon">
+                  ↗
+                </div>
+
+                <h3>
+                  Pilih salah satu menu
+                </h3>
+
+                <p>
+                  Konten link akan ditampilkan
+                  di panel ini tanpa menutup
+                  daftar menu.
+                </p>
+
+              </div>
+
+              <div
+                id="splitPreviewFallback"
+                class="split-preview-placeholder hidden"
+              >
+                <div class="split-placeholder-icon">
+                  ↗
+                </div>
+
+                <h3 id="splitFallbackTitle">
+                  Konten tidak dapat ditampilkan di panel
+                </h3>
+
+                <p id="splitFallbackMessage">
+                  Website ini membatasi tampilan di dalam aplikasi lain.
+                </p>
+
+                <a
+                  id="splitFallbackButton"
+                  class="btn"
+                  href="#"
+                  target="_blank"
+                  rel="noopener"
+                  style="
+                    margin-top:16px;
+                    text-decoration:none;
+                    display:inline-flex;
+                  "
+                >
+                  Buka Halaman ↗
+                </a>
+              </div>
+
+
+              <!-- Loading -->
+              <div
+                id="splitPreviewLoading"
+                class="split-preview-loading hidden"
+              >
+                <div class="split-spinner"></div>
+
+                <span>
+                  Memuat konten...
+                </span>
+              </div>
+
+
+              <!-- IFRAME -->
+              <div
+                id="splitFrameWrap"
+                class="split-frame-wrap hidden"
+              >
+
+                <iframe
+                  id="splitPreviewFrame"
+                  title="Preview Bio Link"
+                  loading="eager"
+                  referrerpolicy="strict-origin-when-cross-origin"
+                  allow="
+                    accelerometer;
+                    autoplay;
+                    clipboard-write;
+                    encrypted-media;
+                    gyroscope;
+                    picture-in-picture;
+                    web-share;
+                    fullscreen
+                  "
+                  allowfullscreen
+                ></iframe>
+
+              </div>
+
+
+              <div
+                id="splitIframeNotice"
+                class="split-iframe-notice hidden"
+              >
+                Beberapa website membatasi tampilan
+                di dalam halaman lain. Jika konten
+                tidak muncul, gunakan
+                <strong>Buka di Tab Baru</strong>.
+              </div>
+
+            </section>
+
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    
+
+    <a class="admin-fab" href="<?= ScriptApp.getService().getUrl(); ?>?page=admin" target="_top">Admin</a>
+  <? } ?>
+
+  <div id="resetPasswordModal" class="modal-backdrop hidden">
+      <div class="modal-card">
+        <div class="modal-header">
+          <div>
+            <h3>Reset Password Admin</h3>
+            <p>Ubah password login admin yang tersimpan di sheet ADMIN_USERS.</p>
+          </div>
+          <button type="button" class="modal-close" onclick="closeResetPasswordModal()">×</button>
+        </div>
+
+        <form id="resetPasswordForm">
+          <div class="form-group">
+            <label>Password Lama</label>
+            <input id="oldPassword" type="password" placeholder="Masukkan password lama">
+          </div>
+
+          <div class="form-group">
+            <label>Password Baru</label>
+            <input id="newPassword" type="password" placeholder="Minimal 6 karakter">
+          </div>
+
+          <div class="form-group">
+            <label>Konfirmasi Password Baru</label>
+            <input id="confirmNewPassword" type="password" placeholder="Ulangi password baru">
+          </div>
+
+          <div class="btn-row" style="justify-content:flex-end;margin-top:16px;">
+            <button type="button" class="btn btn-light" onclick="closeResetPasswordModal()">Batal</button>
+            <button type="submit" class="btn" id="btnResetPassword">Simpan Password</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script>
+    const PAGE = '<?= page ?>';
+    const ADMIN_TOKEN_KEY = 'KSL_BIO_ADMIN_TOKEN';
+    let ADMIN_DATA = null;
+
+    // VER 1.1 - state tabel lokal, tanpa reload server
+    const LINK_TABLE_STATE = {
+      page: 1,
+      pageSize: 10,
+      search: '',
+      status: 'ALL',
+      sort: 'ORDER_ASC'
+    };
+
+    const ICON_OPTIONS = [
+      '🔗', '▶️', '📸', '☕',
+      '💬', '🌐', '🛒', '📦',
+      '📚', '📝', '📄', '📊',
+      '💰', '🏦', '🎮', '🎧',
+      '⭐', '🔥', '✅', '📌',
+      '🎁', '🚀', '🧾', '👥'
+    ];
+
+    document.addEventListener('DOMContentLoaded', function(){
+      if(PAGE === 'admin'){
+        renderIconPicker();
+        bindLoginForm();
+        bindAdminForms();
+        bindResetPasswordForm();
+        bindAvatarPreview();
+
+        if(
+          typeof bindAvatarFilePreview
+          === 'function'
+        ){
+          bindAvatarFilePreview();
+        }
+
+        bindQrBrandingControls();
+
+        renderPublicQrCode();
+
+        checkAdminSession();
+      }else{
+        loadPublic();
+      }
+    });
+
+    function renderIconPicker(){
+      const wrap = document.getElementById('iconPicker');
+      if(!wrap) return;
+
+      wrap.innerHTML = '';
+
+      ICON_OPTIONS.forEach(icon => {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'icon-option';
+        btn.textContent = icon;
+        btn.title = icon;
+
+        btn.addEventListener('click', function(){
+          setSelectedIcon(icon);
+        });
+
+        wrap.appendChild(btn);
+      });
+
+      setSelectedIcon(val('ICON') || '🔗');
+    }
+
+    function setSelectedIcon(icon){
+      const input = document.getElementById('ICON');
+      if(input) input.value = icon || '🔗';
+
+      document.querySelectorAll('.icon-option').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent === icon);
+      });
+    }
+
+    function loadPublic(){
+      const start = performance.now();
+
+      google.script.run
+        .withSuccessHandler(function(res){
+          const clientTotal = Math.round(performance.now() - start);
+
+          console.log('PUBLIC DATA RESPONSE:', res);
+          console.log('CLIENT LOAD TIME:', clientTotal + ' ms');
+
+          if(res && res.debug){
+            console.table(res.debug.timing || {});
+            console.log('TOTAL LINKS:', res.debug.totalLinks);
+            console.log('ACTIVE LINKS:', res.debug.activeLinks);
+          }
+
+          if(!res || !res.success){
+            const msg = res && res.message
+              ? res.message
+              : 'Gagal memuat halaman publik';
+
+            toast(msg);
+            alert('ERROR PUBLIC:\n' + msg);
+            console.error('PUBLIC DATA ERROR:', res);
+            return;
+          }
+
+          renderPublic(res.profile || {}, res.links || []);
+
+          recordPublicPageView();
+
+          console.log('TOTAL PUBLIC LOAD + RENDER:', Math.round(performance.now() - start) + ' ms');
+        })
+        .withFailureHandler(function(err){
+          console.error('LOAD PUBLIC FAILURE:', err);
+          toast(err.message || 'Terjadi kesalahan saat memuat halaman publik');
+        })
+        .getPublicData();
+    }
+
+    let PUBLIC_VIEW_RECORDED = false;
+
+    function recordPublicPageView(){
+
+      if(PUBLIC_VIEW_RECORDED){
+        return;
+      }
+
+      PUBLIC_VIEW_RECORDED = true;
+
+      google.script.run
+
+        .withSuccessHandler(
+          function(){}
+        )
+
+        .withFailureHandler(
+          function(){}
+        )
+
+        .recordPageView({
+          USER_AGENT:
+            navigator.userAgent || ''
+        });
+    }
+
+    function renderPublic(profile, links){
+
+      const theme =
+        profile.THEME_COLOR ||
+        '#2563eb';
+
+      document.documentElement.style.setProperty(
+        '--primary',
+        theme
+      );
+
+      applyPublicTheme(profile);
+
+
+      /* =========================================
+        EVOLUTION 2 - PUBLIC LAYOUT MODE
+      ========================================= */
+
+      const publicLayoutMode =
+        String(
+          profile.PUBLIC_LAYOUT_MODE ||
+          'STANDARD'
+        )
+          .trim()
+          .toUpperCase();
+
+      const isSplitLayout =
+        publicLayoutMode === 'SPLIT';
+
+      document.body.classList.toggle(
+        'public-layout-split',
+        isSplitLayout
+      );
+
+
+      /* =========================================
+        PROFILE
+      ========================================= */
+
+      document.title =
+        profile.APP_TITLE ||
+        profile.NAME ||
+        'KSL Bio Link';
+
+
+      const avatar =
+        document.getElementById('avatar');
+
+      if(avatar){
+        avatar.src =
+          profile.AVATAR_URL ||
+          'https://placehold.co/300x300?text=KSL';
+      }
+
+
+      const publicName =
+        document.getElementById('publicName');
+
+      if(publicName){
+        publicName.textContent =
+          profile.NAME ||
+          'Kucing Storia Labs';
+      }
+
+
+      const publicBio =
+        document.getElementById('publicBio');
+
+      if(publicBio){
+        publicBio.textContent =
+          profile.BIO ||
+          '';
+      }
+
+
+      /* =========================================
+        SOCIAL LINKS
+        Tetap buka di tab baru
+      ========================================= */
+
+      const socials =
+        document.getElementById('socials');
+
+      if(socials){
+
+        socials.innerHTML = '';
+
+        const socialItems = [
+          {
+            key:'WHATSAPP',
+            icon:'💬',
+            label:'WhatsApp'
+          },
+          {
+            key:'INSTAGRAM',
+            icon:'📸',
+            label:'Instagram'
+          },
+          {
+            key:'YOUTUBE',
+            icon:'▶️',
+            label:'YouTube'
+          },
+          {
+            key:'TRAKTEER',
+            icon:'☕',
+            label:'Trakteer'
+          }
+        ];
+
+
+        socialItems.forEach(function(item){
+
+          const url =
+            String(
+              profile[item.key] || ''
+            ).trim();
+
+          if(!url){
+            return;
+          }
+
+          const a =
+            document.createElement('a');
+
+          a.href = url;
+          a.target = '_blank';
+          a.rel = 'noopener';
+          a.title = item.label;
+          a.textContent = item.icon;
+
+          socials.appendChild(a);
+        });
+      }
+
+
+      /* =========================================
+        PUBLIC LINKS
+      ========================================= */
+
+      const wrap =
+        document.getElementById('publicLinks');
+
+      if(!wrap){
+        return;
+      }
+
+      wrap.innerHTML = '';
+
+
+      if(
+        !Array.isArray(links) ||
+        !links.length
+      ){
+
+        wrap.innerHTML =
+          '<div class="empty">Belum ada link aktif.</div>';
+
+      }else{
+
+        links.forEach(function(link){
+
+          const a =
+            document.createElement('a');
+
+          a.className =
+            'link-btn';
+
+
+          /* =====================================
+            FEATURED
+          ===================================== */
+
+          const isFeatured =
+            String(
+              link.FEATURED || ''
+            )
+              .trim()
+              .toUpperCase() === 'YES';
+
+          if(isFeatured){
+            a.classList.add(
+              'featured-link'
+            );
+          }
+
+
+          /* =====================================
+            URL
+          ===================================== */
+
+          const linkUrl =
+            String(
+              link.URL || ''
+            ).trim();
+
+          a.href =
+            linkUrl || '#';
+
+          a.rel =
+            'noopener';
+
+
+          /* =====================================
+            SPLIT / STANDARD BEHAVIOR
+          ===================================== */
+
+          if(isSplitLayout){
+
+            a.removeAttribute(
+              'target'
+            );
+
+            a.addEventListener(
+              'click',
+              function(event){
+
+                event.preventDefault();
+
+                if(!linkUrl){
+
+                  toast(
+                    'URL link tidak tersedia'
+                  );
+
+                  return;
+                }
+
+                /*
+                * Klik user tetap dicatat.
+                */
+                recordClick(
+                  link
+                );
+
+                /*
+                * Tampilkan link di panel kanan.
+                */
+                openSplitPreview(
+                  link,
+                  a
+                );
+              }
+            );
+
+          }else{
+
+            a.target =
+              '_blank';
+
+            a.addEventListener(
+              'click',
+              function(event){
+
+                if(!linkUrl){
+
+                  event.preventDefault();
+
+                  toast(
+                    'URL link tidak tersedia'
+                  );
+
+                  return;
+                }
+
+                /*
+                * Behavior existing.
+                */
+                recordClick(
+                  link
+                );
+              }
+            );
+          }
+
+
+          /* =====================================
+            CTA
+          ===================================== */
+
+          const ctaLabel =
+            getCtaLabel(
+              link.CTA_TYPE
+            );
+
+
+          /* =====================================
+            CAMPAIGN
+          ===================================== */
+
+          const campaignHtml =
+            link.CAMPAIGN
+              ? `
+                <span class="mini-badge-v13">
+                  ${escapeHtml(
+                    link.CAMPAIGN
+                  )}
+                </span>
+              `
+              : '';
+
+
+          /* =====================================
+            LINK CONTENT
+          ===================================== */
+
+          a.innerHTML = `
+
+            ${
+              isFeatured
+                ? `
+                  <div class="featured-label">
+                    ⭐ FEATURED
+                  </div>
+                `
+                : ''
+            }
+
+            <div class="link-icon">
+              ${escapeHtml(
+                link.ICON ||
+                '🔗'
+              )}
+            </div>
+
+            <div class="link-content-v13">
+
+              <div class="link-title-v13">
+                ${escapeHtml(
+                  link.TITLE ||
+                  'Link'
+                )}
+              </div>
+
+              <div class="link-meta-v13">
+
+                <span class="mini-badge-v13">
+                  ${escapeHtml(
+                    ctaLabel
+                  )}
+                </span>
+
+                ${campaignHtml}
+
+              </div>
+
+            </div>
+
+            <div class="link-arrow">
+              ${
+                isSplitLayout
+                  ? '›'
+                  : '→'
+              }
+            </div>
+          `;
+
+
+          wrap.appendChild(
+            a
+          );
+
+        });
+
+
+        /* =========================================
+          SPLIT MODE - AUTO OPEN FIRST LINK
+          WAJIB DI LUAR links.forEach()
+        ========================================= */
+
+        if(isSplitLayout){
+
+          const firstLinkElement =
+            wrap.querySelector(
+              '.link-btn'
+            );
+
+          if(firstLinkElement){
+
+            /*
+            * Tidak memakai .click()
+            * agar analytics tidak bertambah
+            * hanya karena halaman dibuka.
+            */
+
+            openSplitPreview(
+              links[0],
+              firstLinkElement
+            );
+          }
+        }
+      }
+
+
+      /* =========================================
+        SHOW PUBLIC CONTENT
+      ========================================= */
+
+      const publicLoading =
+        document.getElementById(
+          'publicLoading'
+        );
+
+      if(publicLoading){
+        publicLoading.classList.add(
+          'hidden'
+        );
+      }
+
+
+      const publicContent =
+        document.getElementById(
+          'publicContent'
+        );
+
+      if(publicContent){
+        publicContent.classList.remove(
+          'hidden'
+        );
+      }
+    }
+
+    /* =========================================
+      EVOLUTION 2 - SMART EMBED RESOLVER
+    ========================================= */
+
+    function resolveSplitPreviewUrl(rawUrl){
+
+      const url =
+        String(rawUrl || '').trim();
+
+      if(!url){
+        return {
+          embeddable:false,
+          url:'',
+          reason:'EMPTY'
+        };
+      }
+
+
+      /* =====================================
+        YOUTUBE
+      ===================================== */
+
+      try{
+
+        const parsed =
+          new URL(url);
+
+
+        const hostname =
+          parsed.hostname
+            .replace(/^www\./, '')
+            .toLowerCase();
+
+
+        if(
+          hostname === 'youtube.com' ||
+          hostname === 'm.youtube.com'
+        ){
+
+          /*
+          * PLAYLIST
+          *
+          * youtube.com/playlist?list=XXX
+          */
+          if(
+            parsed.pathname === '/playlist'
+          ){
+
+            const listId =
+              parsed.searchParams.get('list');
+
+            if(listId){
+
+              return {
+                embeddable:true,
+                type:'YOUTUBE_PLAYLIST',
+                url:
+                  'https://www.youtube.com/embed/videoseries?list=' +
+                  encodeURIComponent(listId)
+              };
+            }
+          }
+
+
+          /*
+          * WATCH VIDEO
+          *
+          * youtube.com/watch?v=XXX
+          */
+          if(
+            parsed.pathname === '/watch'
+          ){
+
+            const videoId =
+              parsed.searchParams.get('v');
+
+            if(videoId){
+
+              return {
+                embeddable:true,
+                type:'YOUTUBE_VIDEO',
+                url:
+                  'https://www.youtube.com/embed/' +
+                  encodeURIComponent(videoId)
+              };
+            }
+          }
+
+
+          /*
+          * YouTube channel / @handle
+          * tidak kita paksa ke iframe.
+          */
+          if(
+            parsed.pathname.startsWith('/@') ||
+            parsed.pathname.startsWith('/channel/') ||
+            parsed.pathname.startsWith('/c/')
+          ){
+
+            return {
+              embeddable:false,
+              type:'YOUTUBE_CHANNEL',
+              url:url,
+              reason:'CHANNEL_NOT_EMBEDDABLE'
+            };
+          }
+        }
+
+
+        /*
+        * youtu.be/VIDEO_ID
+        */
+        if(
+          hostname === 'youtu.be'
+        ){
+
+          const videoId =
+            parsed.pathname
+              .replace(/^\/+/, '')
+              .split('/')[0];
+
+          if(videoId){
+
+            return {
+              embeddable:true,
+              type:'YOUTUBE_VIDEO',
+              url:
+                'https://www.youtube.com/embed/' +
+                encodeURIComponent(videoId)
+            };
+          }
+        }
+
+
+        /* =====================================
+          GOOGLE DRIVE FILE
+        ===================================== */
+
+        if(
+          hostname === 'drive.google.com'
+        ){
+
+          /*
+          * drive.google.com/file/d/FILE_ID/view
+          */
+          const fileMatch =
+            parsed.pathname.match(
+              /\/file\/d\/([^/]+)/
+            );
+
+          if(fileMatch){
+
+            return {
+              embeddable:true,
+              type:'GOOGLE_DRIVE_FILE',
+              url:
+                'https://drive.google.com/file/d/' +
+                encodeURIComponent(fileMatch[1]) +
+                '/preview'
+            };
+          }
+
+
+          /*
+          * uc?id=...
+          */
+          const driveId =
+            parsed.searchParams.get('id');
+
+          if(driveId){
+
+            return {
+              embeddable:true,
+              type:'GOOGLE_DRIVE_FILE',
+              url:
+                'https://drive.google.com/file/d/' +
+                encodeURIComponent(driveId) +
+                '/preview'
+            };
+          }
+
+
+          /*
+          * drive.google.com saja tidak layak
+          * dijadikan preview.
+          */
+          return {
+            embeddable:false,
+            type:'GOOGLE_DRIVE',
+            url:url,
+            reason:'NOT_FILE_URL'
+          };
+        }
+
+
+        /* =====================================
+          INSTAGRAM
+        ===================================== */
+
+        if(
+          hostname === 'instagram.com'
+        ){
+
+          return {
+            embeddable:false,
+            type:'INSTAGRAM',
+            url:url,
+            reason:'PROVIDER_BLOCKS_FRAME'
+          };
+        }
+
+
+        /* =====================================
+          TRAKTEER
+        ===================================== */
+
+        if(
+          hostname === 'trakteer.id'
+        ){
+
+          return {
+            embeddable:false,
+            type:'TRAKTEER',
+            url:url,
+            reason:'PROVIDER_MAY_BLOCK_FRAME'
+          };
+        }
+
+
+        /*
+        * URL lain:
+        * kita coba iframe secara normal.
+        */
+        return {
+          embeddable:true,
+          type:'GENERIC',
+          url:url
+        };
+
+      }catch(err){
+
+        return {
+          embeddable:false,
+          type:'INVALID',
+          url:url,
+          reason:'INVALID_URL'
+        };
+      }
+    }
+
+    /* =========================================
+      EVOLUTION 2 - SPLIT PREVIEW ENGINE
+    ========================================= */
+
+    let SPLIT_PREVIEW_SEQUENCE = 0;
+
+
+    function openSplitPreview(
+      link,
+      clickedElement
+    ){
+
+      if(!link){
+        return;
+      }
+
+
+      const rawUrl =
+        String(
+          link.URL || ''
+        ).trim();
+
+
+      if(!rawUrl){
+
+        toast(
+          'URL link tidak tersedia'
+        );
+
+        return;
+      }
+
+
+      const resolved =
+        resolveSplitPreviewUrl(
+          rawUrl
+        );
+
+
+      const frame =
+        document.getElementById(
+          'splitPreviewFrame'
+        );
+
+      const frameWrap =
+        document.getElementById(
+          'splitFrameWrap'
+        );
+
+      const placeholder =
+        document.getElementById(
+          'splitPreviewPlaceholder'
+        );
+
+      const fallback =
+        document.getElementById(
+          'splitPreviewFallback'
+        );
+
+      const fallbackTitle =
+        document.getElementById(
+          'splitFallbackTitle'
+        );
+
+      const fallbackMessage =
+        document.getElementById(
+          'splitFallbackMessage'
+        );
+
+      const fallbackButton =
+        document.getElementById(
+          'splitFallbackButton'
+        );
+
+      const loading =
+        document.getElementById(
+          'splitPreviewLoading'
+        );
+
+      const title =
+        document.getElementById(
+          'splitPreviewTitle'
+        );
+
+      const icon =
+        document.getElementById(
+          'splitPreviewIcon'
+        );
+
+      const external =
+        document.getElementById(
+          'splitOpenExternal'
+        );
+
+      const notice =
+        document.getElementById(
+          'splitIframeNotice'
+        );
+
+
+      /* =====================================
+        ACTIVE MENU
+      ===================================== */
+
+      document
+        .querySelectorAll(
+          '#publicLinks .link-btn'
+        )
+        .forEach(function(el){
+
+          el.classList.remove(
+            'split-active'
+          );
+        });
+
+
+      if(clickedElement){
+
+        clickedElement
+          .classList
+          .add(
+            'split-active'
+          );
+      }
+
+
+      /* =====================================
+        HEADER
+      ===================================== */
+
+      if(title){
+
+        title.textContent =
+          link.TITLE ||
+          'Preview';
+      }
+
+
+      if(icon){
+
+        icon.textContent =
+          link.ICON ||
+          '🌐';
+      }
+
+
+      if(external){
+
+        external.href =
+          rawUrl;
+
+        external.classList.remove(
+          'hidden'
+        );
+      }
+
+
+      /* =====================================
+        RESET STATE
+      ===================================== */
+
+      if(placeholder){
+        placeholder.classList.add(
+          'hidden'
+        );
+      }
+
+      if(fallback){
+        fallback.classList.add(
+          'hidden'
+        );
+      }
+
+      if(frameWrap){
+        frameWrap.classList.add(
+          'hidden'
+        );
+      }
+
+      if(loading){
+        loading.classList.add(
+          'hidden'
+        );
+      }
+
+      if(notice){
+        notice.classList.add(
+          'hidden'
+        );
+      }
+
+
+      /*
+      * Hentikan frame sebelumnya.
+      */
+      if(frame){
+
+        frame.onload =
+          null;
+
+        frame.src =
+          'about:blank';
+      }
+
+
+      const sequence =
+        ++SPLIT_PREVIEW_SEQUENCE;
+
+
+      /* =====================================
+        TIDAK EMBEDDABLE
+      ===================================== */
+
+      if(
+        !resolved.embeddable
+      ){
+
+        if(fallbackTitle){
+
+          fallbackTitle.textContent =
+            link.TITLE ||
+            'Buka halaman';
+        }
+
+
+        if(fallbackMessage){
+
+          let message =
+            'Website ini tidak dapat ditampilkan langsung di panel preview.';
+
+
+          if(
+            resolved.type ===
+            'YOUTUBE_CHANNEL'
+          ){
+
+            message =
+              'Halaman channel YouTube tidak dapat ditampilkan sebagai preview penuh.';
+          }
+
+
+          if(
+            resolved.type ===
+            'INSTAGRAM'
+          ){
+
+            message =
+              'Instagram membatasi halaman profil untuk ditampilkan di dalam aplikasi lain.';
+          }
+
+
+          if(
+            resolved.type ===
+            'TRAKTEER'
+          ){
+
+            message =
+              'Halaman Trakteer tidak dapat dijamin tampil di dalam panel preview.';
+          }
+
+
+          if(
+            resolved.type ===
+            'GOOGLE_DRIVE'
+          ){
+
+            message =
+              'Gunakan URL file Google Drive, bukan halaman utama Google Drive.';
+          }
+
+
+          fallbackMessage.textContent =
+            message;
+        }
+
+
+        if(fallbackButton){
+
+          fallbackButton.href =
+            rawUrl;
+        }
+
+
+        if(fallback){
+
+          fallback.classList.remove(
+            'hidden'
+          );
+        }
+
+
+        scrollSplitPreviewOnMobile();
+
+        return;
+      }
+
+
+      /* =====================================
+        EMBEDDABLE
+      ===================================== */
+
+      if(!frame){
+
+        window.open(
+          rawUrl,
+          '_blank',
+          'noopener'
+        );
+
+        return;
+      }
+
+
+      if(loading){
+
+        loading.classList.remove(
+          'hidden'
+        );
+      }
+
+
+      frame.onload =
+        function(){
+
+          if(
+            sequence !==
+            SPLIT_PREVIEW_SEQUENCE
+          ){
+            return;
+          }
+
+
+          if(loading){
+
+            loading.classList.add(
+              'hidden'
+            );
+          }
+
+
+          if(frameWrap){
+
+            frameWrap.classList.remove(
+              'hidden'
+            );
+          }
+
+
+          if(
+            notice &&
+            resolved.type ===
+            'GENERIC'
+          ){
+
+            notice.classList.remove(
+              'hidden'
+            );
+          }
+        };
+
+
+      frame.src =
+        resolved.url;
+
+
+      /*
+      * Safety timeout
+      */
+      window.setTimeout(
+        function(){
+
+          if(
+            sequence !==
+            SPLIT_PREVIEW_SEQUENCE
+          ){
+            return;
+          }
+
+
+          if(loading){
+
+            loading.classList.add(
+              'hidden'
+            );
+          }
+
+
+          if(frameWrap){
+
+            frameWrap.classList.remove(
+              'hidden'
+            );
+          }
+
+        },
+        4500
+      );
+
+
+      scrollSplitPreviewOnMobile();
+    }
+
+    function scrollSplitPreviewOnMobile(){
+
+      if(
+        !window.matchMedia(
+          '(max-width:760px)'
+        ).matches
+      ){
+        return;
+      }
+
+
+      const previewPanel =
+        document.getElementById(
+          'publicPreviewPanel'
+        );
+
+
+      if(!previewPanel){
+        return;
+      }
+
+
+      window.setTimeout(
+        function(){
+
+          previewPanel.scrollIntoView({
+            behavior:'smooth',
+            block:'start'
+          });
+
+        },
+        120
+      );
+    }
+
+    function getCtaLabel(type){
+
+      const map = {
+
+        LINK:
+          '🔗 Buka',
+
+        WATCH:
+          '▶️ Tonton',
+
+        DOWNLOAD:
+          '⬇️ Download',
+
+        BUY:
+          '🛒 Beli',
+
+        CONTACT:
+          '💬 Hubungi',
+
+        PORTFOLIO:
+          '💼 Portfolio',
+
+        SOCIAL:
+          '❤️ Social'
+      };
+
+      return (
+        map[
+          String(
+            type || 'LINK'
+          ).toUpperCase()
+        ]
+        || '🔗 Buka'
+      );
+    }
+
+    function loadAdmin(){
+      const token = getAdminToken();
+
+      google.script.run
+        .withSuccessHandler(function(res){
+          if(!res || !res.success){
+            toast('Gagal memuat data admin');
+            return;
+          }
+
+          ADMIN_DATA = res;
+          renderAdmin(
+            res.profile || {},
+            res.links || [],
+            res.summary || {},
+            res.analytics || {}
+          );
+        })
+        .withFailureHandler(function(err){
+          toast(err.message || 'Terjadi kesalahan');
+
+          const msg = String(err.message || '').toLowerCase();
+
+          if(
+            msg.includes('sesi') ||
+            msg.includes('token') ||
+            msg.includes('akses ditolak')
+          ){
+            clearAdminToken();
+            showLoginPage();
+          }
+        })
+        .getAdminData(token);
+    }
+
+    function renderAdmin(profile, links, summary, analytics){
+      const fields = [
+        'APP_TITLE',
+        'NAME',
+        'BIO',
+        'AVATAR_URL',
+
+        'PUBLIC_LAYOUT_MODE',
+
+        'THEME_COLOR',
+        'BG_STYLE',
+        'BUTTON_STYLE',
+        'WHATSAPP',
+        'INSTAGRAM',
+        'YOUTUBE',
+        'TRAKTEER'
+      ];
+
+      fields.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.value = profile[id] || '';
+      });
+
+      const qrLogoEnabledEl =
+        document.getElementById(
+          'QR_LOGO_ENABLED'
+        );
+
+      if(qrLogoEnabledEl){
+
+        qrLogoEnabledEl.checked =
+          String(
+            profile.QR_LOGO_ENABLED ||
+            'YES'
+          ).toUpperCase() !== 'NO';
+      }
+
+      /* ==============================
+        EVOLUTION 2 - SPLIT VIEW
+      ============================== */
+
+      const publicLayoutModeEl =
+        document.getElementById(
+          'PUBLIC_LAYOUT_MODE'
+        );
+
+      if(publicLayoutModeEl){
+
+        publicLayoutModeEl.value =
+          String(
+            profile.PUBLIC_LAYOUT_MODE ||
+            'STANDARD'
+          ).toUpperCase() === 'SPLIT'
+            ? 'SPLIT'
+            : 'STANDARD';
+      }
+
+
+      updateAdminAvatarPreview(profile.AVATAR_URL || '');
+
+      renderPublicQrCode();
+
+      if(document.getElementById('BG_STYLE')){
+        document.getElementById('BG_STYLE').value = profile.BG_STYLE || 'SOFT';
+      }
+
+      if(document.getElementById('BUTTON_STYLE')){
+        document.getElementById('BUTTON_STYLE').value = profile.BUTTON_STYLE || 'CARD';
+      }
+
+      updateThemePreview();
+      bindThemePreviewEvents();
+
+      summary = summary || {};
+
+      document.getElementById('statTotalLinks').textContent = formatNumber(summary.totalLinks || 0);
+      document.getElementById('statActiveLinks').textContent = formatNumber(summary.activeLinks || 0);
+      document.getElementById('statTotalClicks').textContent = formatNumber(summary.totalClicks || 0);
+
+      setText(
+        'statPageViews',
+        formatNumber(
+          summary.totalViews || 0
+        )
+      );
+
+      setText(
+        'statCTR',
+        formatNumber(
+          summary.ctr || 0
+        ) + '%'
+      );
+
+      setText(
+        'statLiveLinks',
+        formatNumber(
+          summary.liveLinks || 0
+        )
+      );
+
+      setText(
+        'statScheduledLinks',
+        formatNumber(
+          summary.scheduledLinks || 0
+        )
+      );
+
+      renderAnalytics(analytics || {});
+      renderLinksTable(links);
+
+      document.getElementById('adminLoading').classList.add('hidden');
+      document.getElementById('adminContent').classList.remove('hidden');
+    }
+
+
+    // VER 1.2 - mengambil analytics berdasarkan periode yang dipilih
+    function loadAnalytics(days){
+      const loading = document.getElementById('analyticsLoading');
+      const content = document.getElementById('analyticsContent');
+      if(loading) loading.classList.remove('hidden');
+      if(content) content.classList.add('hidden');
+
+      google.script.run
+        .withSuccessHandler(function(res){
+          if(loading) loading.classList.add('hidden');
+          if(content) content.classList.remove('hidden');
+
+          if(!res || !res.success){
+            toast('Analytics gagal dimuat');
+            return;
+          }
+
+          if(ADMIN_DATA) ADMIN_DATA.analytics = res.analytics || {};
+          renderAnalytics(res.analytics || {});
+        })
+        .withFailureHandler(function(err){
+          if(loading) loading.classList.add('hidden');
+          if(content) content.classList.remove('hidden');
+          toast(err.message || 'Gagal memuat analytics');
+        })
+        .getClickAnalytics(Number(days || 30), getAdminToken());
+    }
+
+    function renderAnalytics(data){
+      data = data || {};
+
+      setText('statClicksToday', formatNumber(data.clicksToday || 0));
+      setText('statClicks7Days', formatNumber(data.clicks7Days || 0));
+      setText('analyticsTotalRange', formatNumber(data.totalInRange || 0));
+      setText('analyticsAverage', formatNumber(data.averagePerDay || 0));
+      setText(
+        'analyticsPeak',
+        data.peakDate ? formatDateLabel(data.peakDate) + ' (' + formatNumber(data.peakClicks || 0) + ')' : '-'
+      );
+
+      renderClickChart(data.dailySeries || []);
+      renderTopLinksAnalytics(data.topLinks || []);
+      renderDeviceAnalytics(data.devices || []);
+    }
+
+    function renderClickChart(series){
+      const wrap = document.getElementById('clickChart');
+      if(!wrap) return;
+
+      series = Array.isArray(series) ? series : [];
+      if(!series.length){
+        wrap.innerHTML = '<div class="empty" style="width:100%;align-self:center;">Belum ada data klik.</div>';
+        return;
+      }
+
+      // Untuk periode panjang, gabungkan titik visual agar grafik tetap ringan.
+      let displaySeries = series;
+      if(series.length > 45){
+        const chunk = Math.ceil(series.length / 45);
+        displaySeries = [];
+        for(let i = 0; i < series.length; i += chunk){
+          const group = series.slice(i, i + chunk);
+          displaySeries.push({
+            date: group[group.length - 1].date,
+            label: group[group.length - 1].label,
+            clicks: group.reduce((sum, item) => sum + Number(item.clicks || 0), 0)
+          });
+        }
+      }
+
+      const max = Math.max(1, ...displaySeries.map(item => Number(item.clicks || 0)));
+      const showEvery = Math.max(1, Math.ceil(displaySeries.length / 8));
+
+      wrap.innerHTML = displaySeries.map((item, index) => {
+        const clicks = Number(item.clicks || 0);
+        const height = Math.max(2, Math.round((clicks / max) * 100));
+        const label = index % showEvery === 0 || index === displaySeries.length - 1
+          ? `<span class="chart-label-v12">${escapeHtml(item.label || '')}</span>`
+          : '';
+
+        return `
+          <div class="chart-item-v12" title="${escapeAttr(item.date || '')}: ${clicks} klik">
+            <div class="chart-bar-v12" style="height:${height}%"></div>
+            ${label}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function renderTopLinksAnalytics(items){
+      const wrap = document.getElementById('topLinksAnalytics');
+      if(!wrap) return;
+
+      if(!items.length){
+        wrap.innerHTML = '<div class="empty" style="padding:18px 0;">Belum ada klik pada periode ini.</div>';
+        return;
+      }
+
+      wrap.innerHTML = items.map((item, index) => `
+        <div class="rank-row-v12">
+          <div class="rank-number-v12">${index + 1}</div>
+          <div class="rank-title-v12" title="${escapeAttr(item.title || '')}">${escapeHtml(item.title || 'Tanpa Judul')}</div>
+          <div class="rank-click-v12">${formatNumber(item.clicks || 0)}</div>
+        </div>
+      `).join('');
+    }
+
+    function renderDeviceAnalytics(items){
+      const wrap = document.getElementById('deviceAnalytics');
+      if(!wrap) return;
+
+      const total = items.reduce((sum, item) => sum + Number(item.value || 0), 0);
+      if(!total){
+        wrap.innerHTML = '<div class="empty" style="padding:18px 0;">Belum ada informasi perangkat.</div>';
+        return;
+      }
+
+      wrap.innerHTML = items.map(item => {
+        const value = Number(item.value || 0);
+        const percent = Math.round(value / total * 100);
+        return `
+          <div class="device-row-v12">
+            <div class="device-meta-v12">
+              <span>${escapeHtml(item.name || 'Lainnya')}</span>
+              <strong>${formatNumber(value)} · ${percent}%</strong>
+            </div>
+            <div class="device-track-v12"><div class="device-fill-v12" style="width:${percent}%"></div></div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function setText(id, text){
+      const el = document.getElementById(id);
+      if(el) el.textContent = text;
+    }
+
+    function formatNumber(value){
+      const num = Number(value || 0);
+      return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 1 }).format(num);
+    }
+
+    function formatDateLabel(dateText){
+      const parts = String(dateText || '').split('-');
+      if(parts.length !== 3) return dateText || '-';
+      return parts[2] + '/' + parts[1] + '/' + parts[0];
+    }
+
+    function renderLinksTable(links){
+      links = Array.isArray(links) ? links : [];
+
+      const searchEl = document.getElementById('linkSearch');
+      const statusEl = document.getElementById('linkStatusFilter');
+      const sortEl = document.getElementById('linkSort');
+      const sizeEl = document.getElementById('linkPageSize');
+
+      LINK_TABLE_STATE.search = searchEl ? String(searchEl.value || '').trim().toLowerCase() : '';
+      LINK_TABLE_STATE.status = statusEl ? String(statusEl.value || 'ALL') : 'ALL';
+      LINK_TABLE_STATE.sort = sortEl ? String(sortEl.value || 'ORDER_ASC') : 'ORDER_ASC';
+      LINK_TABLE_STATE.pageSize = sizeEl ? Number(sizeEl.value || 10) : 10;
+
+      let filtered = links.filter(link => {
+        const title = String(link.TITLE || '').toLowerCase();
+        const url = String(link.URL || '').toLowerCase();
+        const id = String(link.ID_LINK || '').toLowerCase();
+        const status = String(link.STATUS || '').toUpperCase();
+
+        const matchesSearch = !LINK_TABLE_STATE.search ||
+          title.includes(LINK_TABLE_STATE.search) ||
+          url.includes(LINK_TABLE_STATE.search) ||
+          id.includes(LINK_TABLE_STATE.search);
+
+        const matchesStatus = LINK_TABLE_STATE.status === 'ALL' ||
+          status === LINK_TABLE_STATE.status;
+
+        return matchesSearch && matchesStatus;
+      });
+
+      filtered.sort(function(a, b){
+        const orderA = Number(a.SORT_ORDER || 0);
+        const orderB = Number(b.SORT_ORDER || 0);
+        const clickA = Number(a.TOTAL_CLICK || 0);
+        const clickB = Number(b.TOTAL_CLICK || 0);
+        const titleA = String(a.TITLE || '').toLowerCase();
+        const titleB = String(b.TITLE || '').toLowerCase();
+        const updatedA = String(a.UPDATED_AT || '');
+        const updatedB = String(b.UPDATED_AT || '');
+
+        switch(LINK_TABLE_STATE.sort){
+          case 'ORDER_DESC': return orderB - orderA;
+          case 'TITLE_ASC': return titleA.localeCompare(titleB, 'id');
+          case 'TITLE_DESC': return titleB.localeCompare(titleA, 'id');
+          case 'CLICK_DESC': return clickB - clickA;
+          case 'CLICK_ASC': return clickA - clickB;
+          case 'UPDATED_DESC': return updatedB.localeCompare(updatedA);
+          case 'ORDER_ASC':
+          default: return orderA - orderB;
+        }
+      });
+
+      const totalItems = filtered.length;
+      const totalPages = Math.max(1, Math.ceil(totalItems / LINK_TABLE_STATE.pageSize));
+      LINK_TABLE_STATE.page = Math.min(Math.max(1, LINK_TABLE_STATE.page), totalPages);
+
+      const startIndex = (LINK_TABLE_STATE.page - 1) * LINK_TABLE_STATE.pageSize;
+      const pageItems = filtered.slice(startIndex, startIndex + LINK_TABLE_STATE.pageSize);
+
+      renderLinksTableRows(pageItems);
+      renderLinkPagination(totalItems, totalPages, startIndex, pageItems.length);
+    }
+
+    function renderLinksTableRows(links){
+      const wrap = document.getElementById('linksTableWrap');
+      if(!wrap) return;
+
+      if(!links.length){
+        wrap.innerHTML =
+          '<div class="empty">Tidak ada link yang sesuai pencarian atau filter.</div>';
+        return;
+      }
+
+      let html = `
+        <table class="link-table">
+          <thead>
+            <tr>
+              <th>Urut</th>
+              <th>Link</th>
+              <th>Campaign</th>
+              <th>Tayang</th>
+              <th>Klik</th>
+              <th>Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+
+      links.forEach(link => {
+
+        const smartStatus = getSmartStatusClient(link);
+        const smartBadge = getSmartStatusBadge(smartStatus);
+
+        const isFeatured =
+          String(link.FEATURED || '').toUpperCase() === 'YES';
+
+        html += `
+          <tr>
+
+            <td>
+              <strong>
+                ${escapeHtml(link.SORT_ORDER || '')}
+              </strong>
+            </td>
+
+            <td>
+              <strong>
+                ${escapeHtml(link.ICON || '🔗')}
+                ${escapeHtml(link.TITLE || '')}
+                ${isFeatured ? ' ⭐' : ''}
+              </strong>
+
+              <br>
+
+              <span style="
+                color:#6b7280;
+                font-size:12px;
+                word-break:break-all;
+              ">
+                ${escapeHtml(link.URL || '')}
+              </span>
+
+              <br>
+
+              <span style="
+                color:var(--primary);
+                font-size:10px;
+                font-weight:900;
+              ">
+                ${escapeHtml(
+                  getCtaLabel(link.CTA_TYPE)
+                )}
+              </span>
+            </td>
+
+
+            <td>
+              ${
+                link.CAMPAIGN
+                  ? `
+                    <strong>
+                      ${escapeHtml(link.CAMPAIGN)}
+                    </strong>
+                  `
+                  : `
+                    <span style="color:#9ca3af;">
+                      -
+                    </span>
+                  `
+              }
+            </td>
+
+
+            <td>
+              <strong>
+                ${escapeHtml(smartBadge)}
+              </strong>
+
+              ${
+                link.START_AT
+                  ? `
+                    <br>
+                    <span style="
+                      font-size:10px;
+                      color:#6b7280;
+                    ">
+                      Mulai:
+                      ${escapeHtml(
+                        formatScheduleDisplay(link.START_AT)
+                      )}
+                    </span>
+                  `
+                  : ''
+              }
+
+              ${
+                link.END_AT
+                  ? `
+                    <br>
+                    <span style="
+                      font-size:10px;
+                      color:#6b7280;
+                    ">
+                      Selesai:
+                      ${escapeHtml(
+                        formatScheduleDisplay(link.END_AT)
+                      )}
+                    </span>
+                  `
+                  : ''
+              }
+            </td>
+
+
+            <td>
+              <strong>
+                ${escapeHtml(link.TOTAL_CLICK || 0)}
+              </strong>
+            </td>
+
+
+            <td>
+
+              <button
+                class="action-btn"
+                onclick="editLink('${escapeAttr(link.ID_LINK)}')">
+                Edit
+              </button>
+
+              <button
+                class="action-btn"
+                onclick="duplicateLink('${escapeAttr(link.ID_LINK)}')">
+                Duplikat
+              </button>
+
+              <button
+                class="action-btn"
+                onclick="toggleStatus('${escapeAttr(link.ID_LINK)}')">
+                On/Off
+              </button>
+
+              <button
+                class="action-btn"
+                style="background:#fee2e2;color:#991b1b;"
+                onclick="deleteSelectedLink('${escapeAttr(link.ID_LINK)}')">
+                Hapus
+              </button>
+
+            </td>
+
+          </tr>
+        `;
+      });
+
+      html += '</tbody></table>';
+
+      wrap.innerHTML = html;
+    }
+
+    function getSmartStatusClient(link){
+
+      const status =
+        String(link.STATUS || '').toUpperCase();
+
+      if(status !== 'ACTIVE'){
+        return 'INACTIVE';
+      }
+
+      const now = new Date();
+
+      const start = link.START_AT
+        ? new Date(
+            String(link.START_AT)
+              .replace(' ', 'T')
+          )
+        : null;
+
+      const end = link.END_AT
+        ? new Date(
+            String(link.END_AT)
+              .replace(' ', 'T')
+          )
+        : null;
+
+
+      if(
+        start &&
+        !isNaN(start.getTime()) &&
+        now < start
+      ){
+        return 'SCHEDULED';
+      }
+
+
+      if(
+        end &&
+        !isNaN(end.getTime()) &&
+        now > end
+      ){
+        return 'ENDED';
+      }
+
+
+      return 'LIVE';
+    }
+
+
+    function getSmartStatusBadge(status){
+
+      const map = {
+        LIVE: '🟢 Tayang',
+        SCHEDULED: '🕒 Terjadwal',
+        ENDED: '⚫ Berakhir',
+        INACTIVE: '🔴 Nonaktif'
+      };
+
+      return map[status] || status;
+    }
+
+
+    function formatScheduleDisplay(value){
+
+      const text =
+        String(value || '').trim();
+
+      if(!text) return '-';
+
+      const date =
+        new Date(
+          text.replace(' ', 'T')
+        );
+
+      if(isNaN(date.getTime())){
+        return text;
+      }
+
+      return new Intl.DateTimeFormat(
+        'id-ID',
+        {
+          day:'2-digit',
+          month:'2-digit',
+          year:'numeric',
+          hour:'2-digit',
+          minute:'2-digit'
+        }
+      ).format(date);
+    }
+
+    function renderLinkPagination(totalItems, totalPages, startIndex, visibleCount){
+      const info = document.getElementById('linkResultInfo');
+      const pagination = document.getElementById('linkPagination');
+
+      if(info){
+        const from = totalItems ? startIndex + 1 : 0;
+        const to = totalItems ? startIndex + visibleCount : 0;
+        info.textContent = `Menampilkan ${from}-${to} dari ${totalItems} link`;
+      }
+
+      if(!pagination) return;
+      pagination.innerHTML = '';
+
+      pagination.appendChild(createPageButton('Prev', LINK_TABLE_STATE.page - 1, LINK_TABLE_STATE.page === 1));
+
+      getVisiblePageNumbers(LINK_TABLE_STATE.page, totalPages).forEach(page => {
+        if(page === '...'){
+          const dots = document.createElement('span');
+          dots.textContent = '...';
+          dots.style.padding = '0 4px';
+          pagination.appendChild(dots);
+          return;
+        }
+
+        const btn = createPageButton(String(page), page, false);
+        if(page === LINK_TABLE_STATE.page) btn.classList.add('active');
+        pagination.appendChild(btn);
+      });
+
+      pagination.appendChild(createPageButton('Next', LINK_TABLE_STATE.page + 1, LINK_TABLE_STATE.page === totalPages));
+    }
+
+    function createPageButton(label, page, disabled){
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'page-btn';
+      btn.textContent = label;
+      btn.disabled = Boolean(disabled);
+      btn.addEventListener('click', function(){
+        if(btn.disabled) return;
+        LINK_TABLE_STATE.page = page;
+        renderLinksTable((ADMIN_DATA && ADMIN_DATA.links) || []);
+      });
+      return btn;
+    }
+
+    function getVisiblePageNumbers(current, total){
+      if(total <= 7){
+        return Array.from({length:total}, (_, i) => i + 1);
+      }
+
+      if(current <= 4) return [1,2,3,4,5,'...',total];
+      if(current >= total - 3) return [1,'...',total-4,total-3,total-2,total-1,total];
+      return [1,'...',current-1,current,current+1,'...',total];
+    }
+
+    function applyLinkTableFilters(resetPage){
+      if(resetPage) LINK_TABLE_STATE.page = 1;
+      renderLinksTable((ADMIN_DATA && ADMIN_DATA.links) || []);
+    }
+
+    function changeLinkPageSize(){
+      LINK_TABLE_STATE.page = 1;
+      applyLinkTableFilters(false);
+    }
+
+    function duplicateLink(idLink){
+      const link = ((ADMIN_DATA && ADMIN_DATA.links) || [])
+        .find(item => String(item.ID_LINK) === String(idLink));
+
+      if(!link){
+        toast('Link tidak ditemukan');
+        return;
+      }
+
+      document.getElementById('ID_LINK').value = '';
+      document.getElementById('TITLE').value = (link.TITLE || '') + ' - Copy';
+      document.getElementById('URL').value = link.URL || '';
+      setSelectedIcon(link.ICON || '🔗');
+      document.getElementById('SORT_ORDER').value = Number(link.SORT_ORDER || 0) + 1;
+      document.getElementById('STATUS').value = String(link.STATUS || 'ACTIVE').toUpperCase();
+
+      document.getElementById('CTA_TYPE').value =
+        link.CTA_TYPE || 'LINK';
+
+      document.getElementById('CAMPAIGN').value =
+        link.CAMPAIGN || '';
+
+      document.getElementById('FEATURED').value =
+        'NO';
+
+      document.getElementById('START_AT').value =
+        toDateTimeLocalValue(link.START_AT);
+
+      document.getElementById('END_AT').value =
+        toDateTimeLocalValue(link.END_AT);
+
+      document.getElementById('TITLE').focus();
+      window.scrollTo({top:0, behavior:'smooth'});
+      toast('Data link disalin ke form. Silakan simpan.');
+    }
+
+    function bindAdminForms(){
+      const profileForm = document.getElementById('profileForm');
+      const linkForm = document.getElementById('linkForm');
+
+      profileForm.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        const payload = {
+          APP_TITLE: val('APP_TITLE'),
+          NAME: val('NAME'),
+          BIO: val('BIO'),
+
+          AVATAR_URL:
+            val('AVATAR_URL'),
+
+          QR_LOGO_ENABLED:
+            (
+              document.getElementById(
+                'QR_LOGO_ENABLED'
+              ) &&
+              document.getElementById(
+                'QR_LOGO_ENABLED'
+              ).checked
+            )
+              ? 'YES'
+              : 'NO',
+
+         PUBLIC_LAYOUT_MODE:
+          String(
+            document.getElementById(
+              'PUBLIC_LAYOUT_MODE'
+            ).value
+          )
+            .trim()
+            .toUpperCase(),
+
+          THEME_COLOR:
+            val('THEME_COLOR') ||
+            '#2563eb',
+          BG_STYLE: val('BG_STYLE') || 'SOFT',
+          BUTTON_STYLE: val('BUTTON_STYLE') || 'CARD',
+          WHATSAPP: val('WHATSAPP'),
+          INSTAGRAM: val('INSTAGRAM'),
+          YOUTUBE: val('YOUTUBE'),
+          TRAKTEER: val('TRAKTEER')
+        };
+
+        if(
+          ![
+            'STANDARD',
+            'SPLIT'
+          ].includes(
+            payload.PUBLIC_LAYOUT_MODE
+          )
+        ){
+
+          toast(
+            'Mode tampilan tidak valid'
+          );
+
+          return;
+        }
+
+        console.log(
+          'LAYOUT YANG AKAN DISIMPAN:',
+          payload.PUBLIC_LAYOUT_MODE
+        );
+
+        const btn = document.getElementById('btnSaveProfile');
+        setButtonLoading(btn, true, 'Menyimpan...');
+
+        google.script.run
+          .withSuccessHandler(function(res){
+            setButtonLoading(btn, false, 'Simpan Profil');
+            toast(res.message || 'Profil berhasil disimpan');
+            loadAdmin();
+          })
+          .withFailureHandler(function(err){
+            setButtonLoading(btn, false, 'Simpan Profil');
+            toast(err.message || 'Gagal menyimpan profil');
+          })
+          .saveProfile(payload, getAdminToken());
+      });
+
+      linkForm.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        const payload = {
+
+          ID_LINK:
+            val('ID_LINK'),
+
+          TITLE:
+            val('TITLE'),
+
+          URL:
+            val('URL'),
+
+          ICON:
+            val('ICON') || '🔗',
+
+          SORT_ORDER:
+            val('SORT_ORDER') || 999,
+
+          STATUS:
+            val('STATUS') || 'ACTIVE',
+
+          // VER 1.3
+          CTA_TYPE:
+            val('CTA_TYPE') || 'LINK',
+
+          CAMPAIGN:
+            val('CAMPAIGN'),
+
+          FEATURED:
+            val('FEATURED') || 'NO',
+
+          START_AT:
+            val('START_AT'),
+
+          END_AT:
+            val('END_AT')
+        };
+
+        const btn = document.getElementById('btnSaveLink');
+        setButtonLoading(btn, true, 'Menyimpan...');
+
+        google.script.run
+          .withSuccessHandler(function(res){
+            setButtonLoading(btn, false, 'Simpan Link');
+            toast(res.message || 'Link berhasil disimpan');
+            resetLinkForm();
+            loadAdmin();
+          })
+          .withFailureHandler(function(err){
+            setButtonLoading(btn, false, 'Simpan Link');
+            toast(err.message || 'Gagal menyimpan link');
+          })
+          .saveLink(payload, getAdminToken());
+      });
+    }
+
+    function editLink(idLink){
+      const link = (ADMIN_DATA.links || []).find(item => String(item.ID_LINK) === String(idLink));
+      if(!link){
+        toast('Link tidak ditemukan');
+        return;
+      }
+
+      document.getElementById('ID_LINK').value = link.ID_LINK || '';
+      document.getElementById('TITLE').value = link.TITLE || '';
+      document.getElementById('URL').value = link.URL || '';
+      setSelectedIcon(link.ICON || '🔗');
+      document.getElementById('SORT_ORDER').value = link.SORT_ORDER || '';
+      document.getElementById('STATUS').value = String(link.STATUS || 'ACTIVE').toUpperCase();
+      document
+        .getElementById('CTA_TYPE')
+        .value =
+          link.CTA_TYPE || 'LINK';
+
+      document
+        .getElementById('CAMPAIGN')
+        .value =
+          link.CAMPAIGN || '';
+
+      document
+        .getElementById('FEATURED')
+        .value =
+          String(
+            link.FEATURED || 'NO'
+          ).toUpperCase();
+
+      document
+        .getElementById('START_AT')
+        .value =
+          toDateTimeLocalValue(
+            link.START_AT
+          );
+
+      document
+        .getElementById('END_AT')
+        .value =
+          toDateTimeLocalValue(
+            link.END_AT
+          );
+
+      window.scrollTo({
+        top:0,
+        behavior:'smooth'
+      });
+    }
+
+    function toDateTimeLocalValue(value){
+
+      const text =
+        String(value || '').trim();
+
+      if(!text) return '';
+
+      return text
+        .replace(' ', 'T')
+        .substring(0,16);
+    }
+
+    function resetLinkForm(){
+      document.getElementById('ID_LINK').value = '';
+      document.getElementById('TITLE').value = '';
+      document.getElementById('URL').value = '';
+      setSelectedIcon('🔗');
+      document.getElementById('SORT_ORDER').value = '';
+      document.getElementById('STATUS').value = 'ACTIVE';
+      document.getElementById('CTA_TYPE').value = 'LINK';
+      document.getElementById('CAMPAIGN').value = '';
+      document.getElementById('FEATURED').value = 'NO';
+      document.getElementById('START_AT').value = '';
+      document.getElementById('END_AT').value = '';
+    }
+
+    function toggleStatus(idLink){
+      google.script.run
+        .withSuccessHandler(function(res){
+          toast(res.message || 'Status berhasil diubah');
+          loadAdmin();
+        })
+        .withFailureHandler(function(err){
+          toast(err.message || 'Gagal mengubah status');
+        })
+        .toggleLinkStatus(idLink, getAdminToken());
+    }
+
+    function deleteSelectedLink(idLink){
+      if(!confirm('Hapus link ini?')) return;
+
+      google.script.run
+        .withSuccessHandler(function(res){
+          toast(res.message || 'Link berhasil dihapus');
+          loadAdmin();
+        })
+        .withFailureHandler(function(err){
+          toast(err.message || 'Gagal menghapus link');
+        })
+        .deleteLink(idLink, getAdminToken());
+    }
+
+    function val(id){
+      const el = document.getElementById(id);
+      return el ? String(el.value || '').trim() : '';
+    }
+
+    function setButtonLoading(btn, loading, text){
+      if(!btn) return;
+      btn.disabled = loading;
+      btn.textContent = text;
+    }
+
+    function toast(message){
+      const el = document.getElementById('toast');
+      el.textContent = message;
+      el.classList.remove('hidden');
+
+      setTimeout(() => {
+        el.classList.add('hidden');
+      }, 2800);
+    }
+
+    function escapeHtml(value){
+      return String(value || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function escapeAttr(value){
+      return escapeHtml(value).replace(/`/g, '&#096;');
+    }
+
+    function getAdminToken(){
+      return localStorage.getItem(ADMIN_TOKEN_KEY) || '';
+    }
+
+    function setAdminToken(token){
+      localStorage.setItem(ADMIN_TOKEN_KEY, token || '');
+    }
+
+    function clearAdminToken(){
+      localStorage.removeItem(ADMIN_TOKEN_KEY);
+    }
+
+    function checkAdminSession(){
+      const token = getAdminToken();
+
+      if(!token){
+        showLoginPage();
+        return;
+      }
+
+      google.script.run
+        .withSuccessHandler(function(res){
+          if(res && res.success){
+            showAdminPage();
+            loadAdmin();
+          }else{
+            clearAdminToken();
+            showLoginPage();
+          }
+        })
+        .withFailureHandler(function(){
+          clearAdminToken();
+          showLoginPage();
+        })
+        .adminMe(token);
+    }
+
+    function showLoginPage(){
+      document.getElementById('loginPage').classList.remove('hidden');
+      document.getElementById('adminPage').classList.add('hidden');
+    }
+
+    function showAdminPage(){
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('adminPage').classList.remove('hidden');
+    }
+
+    function bindLoginForm(){
+      const form = document.getElementById('loginForm');
+      if(!form) return;
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        const payload = {
+          email: val('loginEmail'),
+          password: val('loginPassword')
+        };
+
+        const btn = document.getElementById('btnLogin');
+        setButtonLoading(btn, true, 'Memeriksa...');
+
+        google.script.run
+          .withSuccessHandler(function(res){
+            setButtonLoading(btn, false, 'Login Admin');
+
+            if(res && res.success){
+              setAdminToken(res.token);
+              toast(res.message || 'Login berhasil');
+              showAdminPage();
+              loadAdmin();
+            }else{
+              toast('Login gagal');
+            }
+          })
+          .withFailureHandler(function(err){
+            setButtonLoading(btn, false, 'Login Admin');
+            toast(err.message || 'Login gagal');
+          })
+          .adminLogin(payload);
+      });
+    }
+
+    function logoutAdmin(){
+      const token = getAdminToken();
+
+      google.script.run
+        .withSuccessHandler(function(){
+          clearAdminToken();
+          toast('Logout berhasil');
+          showLoginPage();
+        })
+        .withFailureHandler(function(){
+          clearAdminToken();
+          showLoginPage();
+        })
+        .adminLogout(token);
+    }
+
+    function recordClick(link){
+      const payload = {
+        ID_LINK: link.ID_LINK || '',
+        TITLE: link.TITLE || '',
+        URL: link.URL || '',
+        USER_AGENT: navigator.userAgent || ''
+      };
+
+      google.script.run
+        .withSuccessHandler(function(){})
+        .withFailureHandler(function(){})
+        .recordLinkClick(payload);
+    }
+
+    function openResetPasswordModal(){
+      console.log('Klik Reset Password');
+
+      const modal = document.getElementById('resetPasswordModal');
+
+      if(!modal){
+        toast('Modal reset password belum ditemukan di halaman ini');
+        console.error('Element resetPasswordModal tidak ditemukan');
+        return;
+      }
+
+      document.getElementById('oldPassword').value = '';
+      document.getElementById('newPassword').value = '';
+      document.getElementById('confirmNewPassword').value = '';
+
+      modal.classList.remove('hidden');
+
+      setTimeout(() => {
+        const oldPassword = document.getElementById('oldPassword');
+        if(oldPassword) oldPassword.focus();
+      }, 80);
+    }
+
+    function closeResetPasswordModal(){
+      const modal = document.getElementById('resetPasswordModal');
+      if(!modal) return;
+
+      modal.classList.add('hidden');
+    }
+
+    function bindResetPasswordForm(){
+      const form = document.getElementById('resetPasswordForm');
+      if(!form) return;
+
+      form.addEventListener('submit', function(e){
+        e.preventDefault();
+
+        const oldPassword = val('oldPassword');
+        const newPassword = val('newPassword');
+        const confirmNewPassword = val('confirmNewPassword');
+
+        if(!oldPassword){
+          toast('Password lama wajib diisi');
+          return;
+        }
+
+        if(!newPassword || newPassword.length < 6){
+          toast('Password baru minimal 6 karakter');
+          return;
+        }
+
+        if(newPassword !== confirmNewPassword){
+          toast('Konfirmasi password tidak sama');
+          return;
+        }
+
+        const btn = document.getElementById('btnResetPassword');
+        setButtonLoading(btn, true, 'Menyimpan...');
+
+        google.script.run
+          .withSuccessHandler(function(res){
+            setButtonLoading(btn, false, 'Simpan Password');
+
+            if(res && res.success){
+              toast(res.message || 'Password berhasil diubah');
+              closeResetPasswordModal();
+
+              clearAdminToken();
+              showLoginPage();
+            }else{
+              toast('Gagal mengubah password');
+            }
+          })
+          .withFailureHandler(function(err){
+            setButtonLoading(btn, false, 'Simpan Password');
+            toast(err.message || 'Gagal mengubah password');
+          })
+          .resetAdminPassword({
+            oldPassword: oldPassword,
+            newPassword: newPassword
+          }, getAdminToken());
+      });
+    }
+
+    document.addEventListener('click', function(e){
+      const modal = document.getElementById('resetPasswordModal');
+
+      if(!modal || modal.classList.contains('hidden')) return;
+
+      if(e.target === modal){
+        closeResetPasswordModal();
+      }
+    });
+
+    document.addEventListener('keydown', function(e){
+      if(e.key === 'Escape'){
+        closeResetPasswordModal();
+      }
+    });
+
+    function bindThemePreviewEvents(){
+      const ids = ['NAME', 'BIO', 'THEME_COLOR', 'BG_STYLE', 'BUTTON_STYLE'];
+
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el) return;
+
+        if(el.dataset.previewBound === 'YES') return;
+        el.dataset.previewBound = 'YES';
+
+        el.addEventListener('input', updateThemePreview);
+        el.addEventListener('change', updateThemePreview);
+      });
+    }
+
+    function updateThemePreview(){
+      const card = document.getElementById('themePreviewCard');
+      if(!card) return;
+
+      const name = val('NAME') || 'Kucing Storia Labs';
+      const bio = val('BIO') || 'Web App, Google Sheets, Apps Script';
+      const color = val('THEME_COLOR') || '#2563eb';
+      const bgStyle = val('BG_STYLE') || 'SOFT';
+      const buttonStyle = val('BUTTON_STYLE') || 'CARD';
+
+      document.documentElement.style.setProperty('--primary', color);
+
+      const nameEl = document.getElementById('themePreviewName');
+      const bioEl = document.getElementById('themePreviewBio');
+
+      if(nameEl) nameEl.textContent = name;
+      if(bioEl) bioEl.textContent = bio;
+
+      card.className = 'theme-preview-card';
+
+      const bgClassMap = {
+        SOFT: 'bg-soft',
+        DARK: 'bg-dark',
+        CLEAN: 'bg-clean',
+        GLASS: 'bg-glass'
+      };
+
+      const btnClassMap = {
+        CARD: 'btn-card',
+        PILL: 'btn-pill',
+        GLASS: 'btn-glass',
+        OUTLINE: 'btn-outline'
+      };
+
+      card.classList.add(bgClassMap[bgStyle] || 'bg-soft');
+      card.classList.add(btnClassMap[buttonStyle] || 'btn-card');
+    }
+
+    function applyPublicTheme(profile){
+      const bgStyle = String(profile.BG_STYLE || 'SOFT').toUpperCase();
+      const buttonStyle = String(profile.BUTTON_STYLE || 'CARD').toUpperCase();
+
+      document.body.classList.remove(
+        'public-bg-soft',
+        'public-bg-dark',
+        'public-bg-clean',
+        'public-bg-glass',
+        'public-btn-card',
+        'public-btn-pill',
+        'public-btn-glass',
+        'public-btn-outline'
+      );
+
+      const bgMap = {
+        SOFT: 'public-bg-soft',
+        DARK: 'public-bg-dark',
+        CLEAN: 'public-bg-clean',
+        GLASS: 'public-bg-glass'
+      };
+
+      const btnMap = {
+        CARD: 'public-btn-card',
+        PILL: 'public-btn-pill',
+        GLASS: 'public-btn-glass',
+        OUTLINE: 'public-btn-outline'
+      };
+
+      document.body.classList.add(bgMap[bgStyle] || 'public-bg-soft');
+      document.body.classList.add(btnMap[buttonStyle] || 'public-btn-card');
+    }
+
+    function updateAdminAvatarPreview(url){
+      const img = document.getElementById('adminAvatarPreview');
+      if(!img) return;
+
+      const cleanUrl = String(url || '').trim();
+
+      img.onerror = function(){
+        this.onerror = null;
+        this.src = getAvatarFallbackSvg();
+      };
+
+      img.src = cleanUrl || getAvatarFallbackSvg();
+    }
+
+    function bindAvatarPreview(){
+      const input = document.getElementById('AVATAR_URL');
+      if(!input) return;
+
+      if(input.dataset.previewBound === 'YES') return;
+      input.dataset.previewBound = 'YES';
+
+      input.addEventListener('input', function(){
+        updateAdminAvatarPreview(input.value);
+      });
+    }
+
+    function uploadAvatarImage(){
+      const fileInput = document.getElementById('avatarFile');
+      const btn = document.getElementById('btnUploadAvatar');
+
+      if(!fileInput || !fileInput.files || !fileInput.files.length){
+        toast('Pilih foto terlebih dahulu');
+        return;
+      }
+
+      const file = fileInput.files[0];
+
+      if(!file.type || !file.type.startsWith('image/')){
+        toast('File harus berupa gambar');
+        return;
+      }
+
+      if(file.size > 2 * 1024 * 1024){
+        toast('Ukuran gambar maksimal 2MB');
+        return;
+      }
+
+      setButtonLoading(btn, true, 'Mengupload...');
+
+      const reader = new FileReader();
+
+      reader.onload = function(e){
+        const base64 = String(e.target.result || '');
+
+        google.script.run
+          .withSuccessHandler(function(res){
+            setButtonLoading(btn, false, 'Upload Foto Profil');
+
+            if(!res || !res.success){
+              toast('Upload gagal');
+              return;
+            }
+
+            const newAvatarUrl =
+              res.url || '';
+
+            document
+              .getElementById('AVATAR_URL')
+              .value = newAvatarUrl;
+
+            updateAdminAvatarPreview(
+              newAvatarUrl
+            );
+
+            /*
+            * Kalau ADMIN_DATA digunakan oleh aplikasi,
+            * sinkronkan juga state lokal.
+            */
+            if (
+              typeof ADMIN_DATA !== 'undefined' &&
+              ADMIN_DATA
+            ) {
+
+              ADMIN_DATA.profile =
+                ADMIN_DATA.profile || {};
+
+              ADMIN_DATA.profile.AVATAR_URL =
+                newAvatarUrl;
+            }
+
+            renderPublicQrCode();
+
+            toast(
+              res.message ||
+              'Foto profil berhasil diupload'
+            );
+
+            toast(
+              res.message ||
+              'Foto berhasil diupload'
+            );
+          })
+          .withFailureHandler(function(err){
+            setButtonLoading(btn, false, 'Upload Foto Profil');
+            toast(err.message || 'Upload gagal');
+          })
+          .uploadAvatarToDrive({
+            fileName: file.name,
+            mimeType: file.type,
+            base64: base64
+          }, getAdminToken());
+      };
+
+      reader.onerror = function(){
+        setButtonLoading(btn, false, 'Upload Foto Profil');
+        toast('Gagal membaca file gambar');
+      };
+
+      reader.readAsDataURL(file);
+    }
+
+    function getAvatarFallbackSvg(){
+      const svg = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300">
+          <defs>
+            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stop-color="#2563eb"/>
+              <stop offset="100%" stop-color="#38bdf8"/>
+            </linearGradient>
+          </defs>
+          <rect width="300" height="300" rx="150" fill="url(#g)"/>
+          <text x="150" y="165" text-anchor="middle" font-size="72" font-family="Arial" font-weight="700" fill="white">KSL</text>
+        </svg>
+      `;
+
+      return 'data:image/svg+xml;charset=UTF-8,' + encodeURIComponent(svg);
+    }
+
+    
+    function bindAvatarFilePreview(){
+      const fileInput = document.getElementById('avatarFile');
+      if(!fileInput) return;
+
+      if(fileInput.dataset.previewBound === 'YES') return;
+      fileInput.dataset.previewBound = 'YES';
+
+      fileInput.addEventListener('change', function(){
+        if(!fileInput.files || !fileInput.files.length) return;
+
+        const file = fileInput.files[0];
+
+        if(!file.type || !file.type.startsWith('image/')){
+          toast('File harus berupa gambar');
+          return;
+        }
+
+        const reader = new FileReader();
+
+        reader.onload = function(e){
+          updateAdminAvatarPreview(e.target.result);
+        };
+
+        reader.readAsDataURL(file);
+      });
+    }
+
+    let PUBLIC_LINK_URL = '';
+
+    function getPublicLinkUrl(){
+      const baseUrl = '<?= ScriptApp.getService().getUrl(); ?>';
+      return baseUrl;
+    }
+
+    let QR_RENDER_SEQUENCE = 0;
+
+    const QR_LOGO_RUNTIME = {
+      state: 'PLAIN',
+      sourceUrl: ''
+    };
+
+
+    /*
+    * State:
+    *
+    * PLAIN
+    * LOADING
+    * READY
+    * FAILED
+    */
+    function renderPublicQrCode(){
+
+      PUBLIC_LINK_URL =
+        getPublicLinkUrl();
+
+      const textEl =
+        document.getElementById(
+          'publicLinkText'
+        );
+
+      const qrEl =
+        document.getElementById(
+          'publicQrCode'
+        );
+
+      const openBtn =
+        document.getElementById(
+          'openPublicLinkBtn'
+        );
+
+      if(textEl){
+        textEl.textContent =
+          PUBLIC_LINK_URL;
+      }
+
+      if(openBtn){
+        openBtn.href =
+          PUBLIC_LINK_URL;
+      }
+
+      if(!qrEl){
+        return;
+      }
+
+      /*
+      * Setiap render mempunyai sequence.
+      *
+      * Response async lama tidak boleh
+      * mengubah QR baru.
+      */
+      const sequence =
+        ++QR_RENDER_SEQUENCE;
+
+      QR_LOGO_RUNTIME.state =
+        'PLAIN';
+
+      QR_LOGO_RUNTIME.sourceUrl =
+        '';
+
+      qrEl.innerHTML = '';
+
+      if(
+        typeof QRCode ===
+        'undefined'
+      ){
+
+        qrEl.innerHTML =
+          '<div style="font-size:12px;color:#6b7280;text-align:center;">QR library belum termuat</div>';
+
+        return;
+      }
+
+      /*
+      * QR dasar.
+      */
+      new QRCode(
+        qrEl,
+        {
+          text:
+            PUBLIC_LINK_URL,
+
+          width:
+            126,
+
+          height:
+            126,
+
+          /*
+          * HIGH correction tetap digunakan
+          * karena bagian tengah akan diberi logo.
+          */
+          correctLevel:
+            QRCode.CorrectLevel.H
+        }
+      );
+
+      const enabledEl =
+        document.getElementById(
+          'QR_LOGO_ENABLED'
+        );
+
+      /*
+      * Jika checkbox belum tersedia,
+      * default aktif.
+      */
+      const logoEnabled =
+        !enabledEl ||
+        enabledEl.checked;
+
+      const avatarUrl =
+        val('AVATAR_URL');
+
+      if(
+        !logoEnabled ||
+        !avatarUrl
+      ){
+        QR_LOGO_RUNTIME.state =
+          'PLAIN';
+
+        return;
+      }
+
+      /*
+      * Logo QR membutuhkan session admin.
+      * Jangan request backend sebelum token tersedia.
+      */
+      const adminToken =
+        getAdminToken();
+
+      if(!adminToken){
+        QR_LOGO_RUNTIME.state =
+          'PLAIN';
+
+        return;
+      }
+
+      QR_LOGO_RUNTIME.state =
+        'LOADING';
+
+      QR_LOGO_RUNTIME.sourceUrl =
+        avatarUrl;
+
+      console.log(
+        'QR BRANDING DEBUG',
+        {
+          logoEnabled: logoEnabled,
+          avatarUrl: avatarUrl,
+          hasToken: !!adminToken
+        }
+      );
+
+      google.script.run
+
+        .withSuccessHandler(
+          function(res){
+
+            console.log(
+              'QR LOGO RESPONSE',
+              res
+            );
+
+            /*
+            * STALE RESPONSE PROTECTION.
+            */
+            if(
+              sequence !==
+              QR_RENDER_SEQUENCE
+            ){
+              return;
+            }
+
+            if(
+              val('AVATAR_URL') !==
+              avatarUrl
+            ){
+              return;
+            }
+
+            if(
+              !res ||
+              !res.success ||
+              !res.dataUrl
+            ){
+
+              QR_LOGO_RUNTIME.state =
+                'FAILED';
+
+              return;
+            }
+
+            applyLogoToQrCanvas(
+              res.dataUrl,
+              sequence,
+              avatarUrl
+            );
+          }
+        )
+
+        .withFailureHandler(
+          function(err){
+
+            console.warn(
+              'QR LOGO FAILURE',
+              err
+            );
+
+            if(
+              sequence !==
+              QR_RENDER_SEQUENCE
+            ){
+              return;
+            }
+
+            if(
+              val('AVATAR_URL') !==
+              avatarUrl
+            ){
+              return;
+            }
+
+            QR_LOGO_RUNTIME.state =
+              'FAILED';
+          }
+        )
+
+        .getQrLogoDataUrl(
+          avatarUrl,
+          adminToken
+        );
+    }
+
+
+    function applyLogoToQrCanvas(
+      dataUrl,
+      sequence,
+      expectedAvatarUrl
+    ){
+
+      const qrEl =
+        document.getElementById(
+          'publicQrCode'
+        );
+
+      if(!qrEl){
+        return;
+      }
+
+      const canvas =
+        qrEl.querySelector(
+          'canvas'
+        );
+
+      if(!canvas){
+
+        QR_LOGO_RUNTIME.state =
+          'FAILED';
+
+        return;
+      }
+
+      const logo =
+        new Image();
+
+
+      logo.onload =
+        function(){
+
+          /*
+          * Cek stale lagi,
+          * karena Image.onload juga async.
+          */
+          if(
+            sequence !==
+            QR_RENDER_SEQUENCE
+          ){
+            return;
+          }
+
+          if(
+            val('AVATAR_URL') !==
+            expectedAvatarUrl
+          ){
+            return;
+          }
+
+          const enabledEl =
+            document.getElementById(
+              'QR_LOGO_ENABLED'
+            );
+
+          if(
+            enabledEl &&
+            !enabledEl.checked
+          ){
+            return;
+          }
+
+          const ctx =
+            canvas.getContext('2d');
+
+          if(!ctx){
+
+            QR_LOGO_RUNTIME.state =
+              'FAILED';
+
+            return;
+          }
+
+          const canvasSize =
+            Math.min(
+              canvas.width,
+              canvas.height
+            );
+
+          /*
+          * Logo dibuat konservatif.
+          *
+          * 24% ukuran QR.
+          */
+          const logoSize =
+            Math.round(
+              canvasSize * 0.24
+            );
+
+          /*
+          * White protection plate.
+          */
+          const plateSize =
+            Math.round(
+              canvasSize * 0.31
+            );
+
+          const plateX =
+            Math.round(
+              (
+                canvas.width -
+                plateSize
+              ) / 2
+            );
+
+          const plateY =
+            Math.round(
+              (
+                canvas.height -
+                plateSize
+              ) / 2
+            );
+
+          const plateRadius =
+            Math.max(
+              4,
+              Math.round(
+                plateSize * 0.22
+              )
+            );
+
+          ctx.save();
+
+          /*
+          * Putih di belakang logo membantu
+          * memisahkan logo dari modul QR.
+          */
+          drawQrRoundedRect(
+            ctx,
+            plateX,
+            plateY,
+            plateSize,
+            plateSize,
+            plateRadius
+          );
+
+          ctx.fillStyle =
+            '#ffffff';
+
+          ctx.fill();
+
+          /*
+          * Pertahankan aspect ratio logo.
+          */
+          const naturalWidth =
+            Number(
+              logo.naturalWidth ||
+              logo.width ||
+              1
+            );
+
+          const naturalHeight =
+            Number(
+              logo.naturalHeight ||
+              logo.height ||
+              1
+            );
+
+          const scale =
+            Math.min(
+              logoSize /
+                naturalWidth,
+
+              logoSize /
+                naturalHeight
+            );
+
+          const drawWidth =
+            Math.max(
+              1,
+              naturalWidth * scale
+            );
+
+          const drawHeight =
+            Math.max(
+              1,
+              naturalHeight * scale
+            );
+
+          const drawX =
+            (
+              canvas.width -
+              drawWidth
+            ) / 2;
+
+          const drawY =
+            (
+              canvas.height -
+              drawHeight
+            ) / 2;
+
+          /*
+          * Clip logo rounded.
+          */
+          const clipX =
+            (
+              canvas.width -
+              logoSize
+            ) / 2;
+
+          const clipY =
+            (
+              canvas.height -
+              logoSize
+            ) / 2;
+
+          drawQrRoundedRect(
+            ctx,
+            clipX,
+            clipY,
+            logoSize,
+            logoSize,
+            Math.max(
+              3,
+              Math.round(
+                logoSize * 0.18
+              )
+            )
+          );
+
+          ctx.clip();
+
+          ctx.drawImage(
+            logo,
+            drawX,
+            drawY,
+            drawWidth,
+            drawHeight
+          );
+
+          ctx.restore();
+
+          /*
+          * QRCode.js dapat menampilkan <img>
+          * yang merupakan snapshot canvas.
+          *
+          * Setelah logo digambar ke canvas,
+          * sinkronkan ulang IMG agar logo
+          * terlihat di layar.
+          */
+          try {
+
+            const finalQrDataUrl =
+              canvas.toDataURL('image/png');
+
+            const qrImage =
+              qrEl.querySelector('img');
+
+            if(qrImage){
+
+              qrImage.src =
+                finalQrDataUrl;
+
+              /*
+              * Pastikan image hasil akhir
+              * yang ditampilkan.
+              */
+              qrImage.style.display =
+                'block';
+            }
+
+          } catch(err) {
+
+            console.warn(
+              'QR IMAGE SYNC FAILED:',
+              err
+            );
+          }
+
+          QR_LOGO_RUNTIME.state =
+            'READY';
+
+          console.log(
+            'QR LOGO DRAW READY'
+          );
+        };
+
+
+      logo.onerror =
+        function(){
+
+          if(
+            sequence !==
+            QR_RENDER_SEQUENCE
+          ){
+            return;
+          }
+
+          QR_LOGO_RUNTIME.state =
+            'FAILED';
+        };
+
+
+      logo.src =
+        dataUrl;
+    }
+
+
+    function drawQrRoundedRect(
+      ctx,
+      x,
+      y,
+      width,
+      height,
+      radius
+    ){
+
+      const r =
+        Math.min(
+          radius,
+          width / 2,
+          height / 2
+        );
+
+      ctx.beginPath();
+
+      ctx.moveTo(
+        x + r,
+        y
+      );
+
+      ctx.arcTo(
+        x + width,
+        y,
+        x + width,
+        y + height,
+        r
+      );
+
+      ctx.arcTo(
+        x + width,
+        y + height,
+        x,
+        y + height,
+        r
+      );
+
+      ctx.arcTo(
+        x,
+        y + height,
+        x,
+        y,
+        r
+      );
+
+      ctx.arcTo(
+        x,
+        y,
+        x + width,
+        y,
+        r
+      );
+
+      ctx.closePath();
+    }
+
+    function copyPublicLink(){
+      const url = PUBLIC_LINK_URL || getPublicLinkUrl();
+
+      if(navigator.clipboard && navigator.clipboard.writeText){
+        navigator.clipboard.writeText(url)
+          .then(function(){
+            toast('Public link berhasil disalin');
+          })
+          .catch(function(){
+            fallbackCopyText(url);
+          });
+      }else{
+        fallbackCopyText(url);
+      }
+    }
+
+    function fallbackCopyText(text){
+      const input = document.createElement('textarea');
+      input.value = text;
+      input.style.position = 'fixed';
+      input.style.left = '-9999px';
+      input.style.top = '-9999px';
+
+      document.body.appendChild(input);
+      input.focus();
+      input.select();
+
+      try{
+        document.execCommand('copy');
+        toast('Public link berhasil disalin');
+      }catch(err){
+        toast('Gagal copy link');
+      }
+
+      document.body.removeChild(input);
+    }
+
+    function downloadQrCode(){
+
+      const qrEl =
+        document.getElementById(
+          'publicQrCode'
+        );
+
+      if(!qrEl){
+
+        toast(
+          'QR Code belum tersedia'
+        );
+
+        return;
+      }
+
+
+      /*
+      * Logo masih diproses.
+      *
+      * Jangan download QR terlalu cepat
+      * karena file yang diperoleh bisa
+      * belum mempunyai logo.
+      */
+      if(
+        QR_LOGO_RUNTIME.state
+          === 'LOADING'
+      ){
+
+        toast(
+          'Logo QR masih diproses. Coba lagi setelah logo tampil.'
+        );
+
+        return;
+      }
+
+
+      const canvas =
+        qrEl.querySelector(
+          'canvas'
+        );
+
+
+      if(!canvas){
+
+        const img =
+          qrEl.querySelector(
+            'img'
+          );
+
+        if(
+          img &&
+          img.src
+        ){
+
+          downloadImageUrl(
+            img.src,
+            'ksl-bio-link-qr.png'
+          );
+
+          return;
+        }
+
+        toast(
+          'QR Code belum siap'
+        );
+
+        return;
+      }
+
+
+      try {
+
+        const url =
+          canvas.toDataURL(
+            'image/png'
+          );
+
+        downloadImageUrl(
+          url,
+          'ksl-bio-link-qr.png'
+        );
+
+
+        /*
+        * FAILED tidak menghentikan download.
+        *
+        * QR polos masih valid.
+        */
+        if(
+          QR_LOGO_RUNTIME.state
+            === 'FAILED'
+        ){
+
+          toast(
+            'Logo gagal dimuat. QR tanpa logo berhasil didownload.'
+          );
+        }
+
+      } catch(err) {
+
+        console.error(
+          'DOWNLOAD QR ERROR:',
+          err
+        );
+
+        toast(
+          'QR Code gagal didownload.'
+        );
+      }
+    }
+
+    function downloadImageUrl(url, filename){
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename || 'qr-code.png';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      toast('QR Code didownload');
+    }
+
+    function bindQrBrandingControls(){
+
+      const enabledEl =
+        document.getElementById(
+          'QR_LOGO_ENABLED'
+        );
+
+      const avatarEl =
+        document.getElementById(
+          'AVATAR_URL'
+        );
+
+
+      if(
+        enabledEl &&
+        enabledEl.dataset.qrBound
+          !== 'YES'
+      ){
+
+        enabledEl.dataset.qrBound =
+          'YES';
+
+        enabledEl.addEventListener(
+          'change',
+          renderPublicQrCode
+        );
+      }
+
+
+      if(
+        avatarEl &&
+        avatarEl.dataset.qrBound
+          !== 'YES'
+      ){
+
+        avatarEl.dataset.qrBound =
+          'YES';
+
+        /*
+        * Jangan gunakan input.
+        *
+        * Kalau input digunakan,
+        * setiap karakter URL dapat
+        * menghasilkan server request.
+        */
+        avatarEl.addEventListener(
+          'change',
+          renderPublicQrCode
+        );
+      }
+    }
+
+  </script>
+</body>
+</html>
